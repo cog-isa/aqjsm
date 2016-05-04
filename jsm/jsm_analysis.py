@@ -49,8 +49,8 @@ class FactBase:
                     dup_counter += 1
             else:
                 miss_counter += 1
-        logging.debug('Delete {0} duplicated events'.format(dup_counter))
-        logging.debug('Miss {0} missing target column events'.format(miss_counter))
+        logging.debug('\tDelete {0} duplicated events'.format(dup_counter))
+        logging.debug('\tMiss {0} missing target column events'.format(miss_counter))
 
     def clear(self):
         counter = 0
@@ -58,7 +58,7 @@ class FactBase:
             if self.negatives[key] in self.positives.values():
                 del self.negatives[key]
                 counter += 1
-        logging.debug('Delete {0} conflicted events'.format(counter))
+        logging.debug('\tDelete {0} conflicted events'.format(counter))
 
 
 class JSMHypothesis:

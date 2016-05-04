@@ -19,10 +19,10 @@ def load_data(file_path, class_index, nominal_data):
             data.iloc[:, nom_id] = data.iloc[:, nom_id].cat.rename_categories(nom_data.split(','))
 
     # discretize all non categorical columns
-    for column in data.columns:
+    for index, column in enumerate(data.columns.values):
         if not data[column].dtype.name == 'category':
             data[column] = pd.cut(data[column], 3)
-            column_ranges[column] = data[column].cat.categories
+            column_ranges[column_names[index]] = data[column].cat.categories.values
             data[column] = data[column].cat.rename_categories(['1', '2', '3'])
 
     return data, Fact.canon_prefix + str(class_index)

@@ -36,19 +36,22 @@ if __name__ == "__main__":
     nominal_data = args.nominaldata
 
     data, class_column = dl.load_data(args.datafile, class_index, nominal_data)
-
-    logging.info(
-        'Data file {0}: {2} columns, {3} objects, class column is {1}'.format(args.datafile, class_column,
-                                                                              *reversed(data.shape)))
-    logging.debug('\n\t'.join(['{0}: {1}'.format(key, dl.column_ranges[key]) for key in sorted(dl.column_ranges)]))
+    logging.info('Data file {0}: {2} columns, {3} objects, class column is "{1}"'.format(args.datafile,
+                                                                                         dl.column_names[class_index],
+                                                                                         *reversed(data.shape)))
+    logging.debug('\n\t'.join(['"{0}": {1}'.format(key, dl.column_ranges[key]) for key in sorted(dl.column_ranges)]))
 
     class_descriptions = aq.run_aq(data, class_column, dl.column_names)
     for desc in class_descriptions.values():
         desc.build(max_universe_size)
-
     logging.info('\n'.join([str(class_descriptions[d]) for d in class_descriptions]))
 
     for klass in data[class_column].unique():
+        logging.info('\n' * 3 + '*' * 5 + 'Start search reasons for class {0}'.format(klass) + '*' * 5)
+        fb = FactBase(class_column, [klass])
+        fb.build(data, class_descriptions[klass])
+        fb.clear()
+
         def _search_in_fb(data_fb, target):
             hypotheses = search_norris(data_fb)
             reasons = []
@@ -57,16 +60,11 @@ if __name__ == "__main__":
                     reasons.append(
                         [class_descriptions[klass].properties[i] for i in range(len(hyp.value)) if hyp.value[i]])
             if reasons:
-                logging.info('Found {0} reasons for {1}:\n'.format(len(reasons), target) + '\n\t'.join(
+                logging.info('\tFound {0} reasons for {1}:\n\t'.format(len(reasons), target) + '\n\t'.join(
                     [' & '.join([str(f) for f in r]) for r in reasons]))
             else:
-                logging.debug('Was not found reasons for {0}'.format(target))
+                logging.debug('\tWas not found reasons for {0}'.format(target))
 
-
-        logging.info('*' * 5 + 'Start search reasons for class {0}'.format(klass) + '*' * 5)
-        fb = FactBase(class_column, [klass])
-        fb.build(data, class_descriptions[klass])
-        fb.clear()
 
         _search_in_fb(fb, 'class ' + klass)
 

@@ -11,18 +11,18 @@ class Fact:
     def __str__(self):
         value = ''
         if self.values == {1}:
-            value = 'low'
+            value = 'o__'
         if self.values == {2}:
-            value = 'mid'
+            value = '_o_'
         if self.values == {3}:
-            value = 'high'
+            value = '__o'
         if self.values == {1, 2}:
-            value = 'not high'
+            value = 'oo_'
         if self.values == {2, 3}:
-            value = 'not low'
+            value = '_oo'
         if self.values == {1, 3}:
-            value = 'not mid'
-        return '[{0} value of \'{1}\']'.format(value, self.attr_name)
+            value = 'o_o'
+        return '"{1}"={0}'.format(value, self.attr_name)
 
     def __repr__(self):
         return '{0}={1}'.format(self.canon_attr_name, self.values)
