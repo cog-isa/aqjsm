@@ -83,24 +83,16 @@ class ClassDescription:
             coverage = rule.covered_positives
             for fact in rule.facts:
                 fact.coverage = coverage
-                appended = None
                 for prop in self.properties[:]:
                     if prop.attr_id == fact.attr_id:
-                        if prop.values == fact.values:
-                            prop.coverage = max(prop.coverage, fact.coverage)
-                            appended = prop
-                            break
-                        elif fact.values < prop.values:
-                            prop.coverage = max(prop.coverage, fact.coverage)
-                            appended = prop
-                            break
-                        elif fact.values > prop.values:
+                        appended = prop
+                        if fact.values > prop.values or (not fact.values < prop.values and fact.coverage > prop.coverage):
                             self.properties.remove(prop)
-                            if not appended:
-                                self.properties.append(fact)
-                                appended = fact
-                            appended.coverage = max(prop.coverage, fact.coverage)
-                if not appended:
+                            self.properties.append(fact)
+                            appended = fact
+                        appended.coverage = max(prop.coverage, fact.coverage)
+                        break
+                else:
                     self.properties.append(fact)
 
         self.properties.sort(key=lambda x: (x.coverage, x.attr_name), reverse=True)

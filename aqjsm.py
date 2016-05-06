@@ -54,16 +54,19 @@ if __name__ == "__main__":
         fb.build(data, class_descriptions[klass])
         fb.clear()
 
+
         def _search_in_fb(data_fb, target):
             hypotheses = search_norris(data_fb)
             reasons = []
             for hyp in hypotheses:
                 if hyp.value.count() <= max_reason_length:
-                    reasons.append(
-                        [class_descriptions[klass].properties[i] for i in range(len(hyp.value)) if hyp.value[i]])
+                    reasons.append((len(hyp.generator),
+                                    [data_fb.properties[i] for i in range(len(hyp.value)) if
+                                     hyp.value[i]]))
             if reasons:
+                reasons.sort(key=lambda x: x[0], reverse=True)
                 logging.info('\tFound {0} reasons for {1}:\n\t'.format(len(reasons), target) + '\n\t'.join(
-                    [' & '.join([str(f) for f in r]) for r in reasons]))
+                    ['[{0}]: '.format(q) + ' & '.join([str(f) for f in r]) for q, r in reasons]))
             else:
                 logging.debug('\tWas not found reasons for {0}'.format(target))
 
