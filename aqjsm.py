@@ -1,6 +1,7 @@
 import data.data_loading as dl
 import aq.aq_external as aq
 from jsm.jsm_analysis import FactBase, search_norris
+from aq.aq_description import Fact
 import sys, platform, datetime
 import argparse
 import logging
@@ -48,7 +49,8 @@ if __name__ == "__main__":
 
     for klass in data[class_column].unique():
         logging.info('\n' * 3 + '*' * 5 + 'Start search reasons for class {0}'.format(klass) + '*' * 5)
-        fb = FactBase(class_column, [klass])
+        logging.info('Start search reasons for class property {0}'.format(klass))
+        fb = FactBase(Fact(class_index, {klass}, 'class'))
         fb.build(data, class_descriptions[klass])
         fb.clear()
 
@@ -69,7 +71,8 @@ if __name__ == "__main__":
         _search_in_fb(fb, 'class ' + klass)
 
         for prop in class_descriptions[klass].properties:
-            fb = FactBase(prop.canon_attr_name, prop.values)
+            logging.info('Start search reasons for property {0}'.format(prop))
+            fb = FactBase(prop)
             fb.build(data, class_descriptions[klass])
             fb.clear()
 

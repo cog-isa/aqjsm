@@ -1,54 +1,55 @@
 import itertools
-import math
-from bitarray import bitarray
 import logging
+
+import pandas as pd
+from bitarray import bitarray
+from aq.aq_description import Fact
 
 
 class FactBase:
-    def __init__(self, target_column, target_values):
-        self.target_column = target_column
-        self.target_values = target_values
+    def __init__(self, target_prop):
+        self.target_prop = target_prop
         self.positives = {}
         self.negatives = {}
         self.properties = []
         self.num_events = 0
+        self.num_props = 0
 
     def __str__(self):
-        return 'FactBase for property {0} {1} ({2} props, {3} events: p={4}, n={5}):\n\t'.format(self.target_column,
-                                                                                                 self.target_values,
-                                                                                                 len(self.properties),
-                                                                                                 self.num_events,
-                                                                                                 len(self.positives),
-                                                                                                 len(
-                                                                                                     self.negatives)) + '\n\t'.join(
+        return 'FactBase for property {0} ({1} props, {2} events: p={3}, n={4}):\n\t'.format(self.target_prop,
+                                                                                             len(self.properties),
+                                                                                             self.num_events,
+                                                                                             len(self.positives),
+                                                                                             len(
+                                                                                                 self.negatives)) + '\n\t'.join(
             [b.to01() for b in itertools.chain(self.positives.values(), self.negatives.values())])
 
     def __repr__(self):
-        return 'FactBase for property {0} {1} (p={2}, n={3}):\n\t'.format(self.target_column, self.target_values,
-                                                                          len(self.positives), len(self.negatives))
+        return 'FactBase for property {0} (p={1}, n={2}):\n\t'.format(self.target_prop,
+                                                                      len(self.positives), len(self.negatives))
 
     def build(self, data, class_description):
-        target_index = data.columns.get_loc(self.target_column)
-        self.properties = [prop for i, prop in enumerate(class_description.properties) if
-                           not prop.attr_name == self.target_column]
-        self.num_events = len(data.values)
+        target_index = data.columns.get_loc(self.target_prop.canon_attr_name)
+        self.properties = [prop for prop in class_description.properties if not prop == self.target_prop]
+        self.num_props = len(self.properties)
         dup_counter = 0
         miss_counter = 0
-        for i, row in enumerate(data.values):
+        for i, row in data.iterrows():
             data_value = row[target_index]
-            if not math.isnan(float(data_value)):
-                b = bitarray(len(self.properties))
+            if not pd.isnull(data_value):
+                b = bitarray(self.num_props)
                 for j, prop in enumerate(self.properties):
                     value = row[prop.attr_id]
-                    b[j] = False if math.isnan(float(value)) else int(value) in prop.values
-                if int(data_value) in self.target_values and b not in self.positives.values():
+                    b[j] = False if pd.isnull(value) else value in prop.values
+                if data_value in self.target_prop.values and b not in self.positives.values():
                     self.positives[i] = b
-                elif b not in self.negatives.values():
+                elif data_value not in self.target_prop.values and b not in self.negatives.values():
                     self.negatives[i] = b
                 else:
                     dup_counter += 1
             else:
                 miss_counter += 1
+        self.num_events = len(self.positives) + len(self.negatives)
         logging.debug('\tDelete {0} duplicated events'.format(dup_counter))
         logging.debug('\tMiss {0} missing target column events'.format(miss_counter))
 
@@ -58,6 +59,7 @@ class FactBase:
             if self.negatives[key] in self.positives.values():
                 del self.negatives[key]
                 counter += 1
+        self.num_events -= counter
         logging.debug('\tDelete {0} conflicted events'.format(counter))
 
 
@@ -86,32 +88,35 @@ def search_norris(fb):
     pos_inters = _search_norris(fb.positives)
     neg_inters = _search_norris(fb.negatives)
 
-    sparse = []
-    for i, p_inter in enumerate(pos_inters):
+    logging.debug('\tIt was found {0} pos and {1} neg hypothesis'.format(len(pos_inters), len(neg_inters)))
+    counter = 0
+    for p_inter in pos_inters[:]:
         for n_inter in neg_inters:
             unit = p_inter.value | n_inter.value
             if len(p_inter.generator) < 2 or unit == p_inter.value or unit == n_inter.value:
-                sparse.append(i)
+                pos_inters.remove(p_inter)
+                counter += 1
+                break
 
-    pos_inters = [pos_inters[i] for i in range(len(pos_inters)) if i not in sparse]
+    logging.debug('\tIt was deleted conflicted {0} hypothesis'.format(counter))
     return pos_inters
 
 
 def _search_norris(positives):
     # Relation R=AxB, A - objects, B - features, Mk - maximal rectangles (maximal intersections)
     hypotheses = []
-    for key, value in positives.items():
+    for key, value in positives.items():  # find object xkR
         # compute collection Tk={Ax(B intersect xkR): AxB in Mk-1}
-        tmp_hyps = [JSMHypothesis(value & h.value, h.generator) for h in hypotheses if (value & h.value).any()]
+        tmp_hyps = [JSMHypothesis(value & h.value, h.generator.copy()) for h in hypotheses if (value & h.value).any()]
         # eliminate the members of Tk which are proper subsets of other members of Tk;
         # remaining sets are the members of T'k
-        spares = set()
-        for i in range(len(tmp_hyps)):
-            for j in range(len(tmp_hyps)):
-                if not i == j and (tmp_hyps[i].value | tmp_hyps[j].value) == tmp_hyps[j].value and tmp_hyps[
-                    j].generator >= tmp_hyps[i].generator:
-                    spares.add(i)
-        tmp_hyps = [tmp_hyps[i] for i in range(len(tmp_hyps)) if i not in spares]
+
+        l = tmp_hyps[:]
+        for i, tmp1 in enumerate(l):
+            for j, tmp2 in enumerate(l):
+                if not i == j and (tmp1.value | tmp2.value) == tmp2.value and tmp2.generator >= tmp1.generator:
+                    tmp_hyps.remove(tmp1)
+                    break
 
         # for each CxD in    Mk-1
         new_hyps = []
@@ -123,20 +128,22 @@ def _search_norris(positives):
             else:
                 # if D not susetoreq xkR then CxD in Mk, and (C unite xk)x(D intersect xkR) in Mk
                 # if and only if emptyset noteq Cx(D intersect xkR) in T'k
-                new_hyp = JSMHypothesis(hyp.value & value, hyp.generator)
+                new_hyp = JSMHypothesis(hyp.value & value, hyp.generator.copy())
                 if new_hyp.value.any() and new_hyp in tmp_hyps:
+                    new_hyp.generator.add(key)
                     new_hyps.append(new_hyp)
             if not value.any() or (hyp.value | value) == hyp.value:
                 add_example = False
 
         hypotheses.extend(new_hyps)
+        # xk x xkR in Mk if and only if emptyset noteq xkR notsubsetoreq D for all XxD in Mk - 1
         if add_example:
             hypotheses.append(JSMHypothesis(value, {key}))
     return hypotheses
 
 
 if __name__ == '__main__':
-    fb = FactBase(0, '1')
+    fb = FactBase(Fact(0, {'1'}))
     fb.positives = {1: bitarray('11000'), 2: bitarray('11010'), 3: bitarray('11100')}
     fb.negatives = {4: bitarray('00101'), 5: bitarray('00110'), 6: bitarray('00011')}
 

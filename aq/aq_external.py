@@ -135,7 +135,7 @@ def _parse_result(result, column_names):
             part_matcher = part_regex.findall(rule)
             if part_matcher:
                 for (attr_id, value) in part_matcher:
-                    f = Fact(int(attr_id), set(map(int, value.split(','))), column_names[int(attr_id)])
+                    f = Fact(int(attr_id), set(value.split(',')), column_names[int(attr_id)])
                     r.facts.append(f)
 
             classes_for_rules[i].rules.append(r)

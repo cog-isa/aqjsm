@@ -10,17 +10,17 @@ class Fact:
 
     def __str__(self):
         value = ''
-        if self.values == {1}:
+        if self.values == {'1'}:
             value = 'o__'
-        if self.values == {2}:
+        if self.values == {'2'}:
             value = '_o_'
-        if self.values == {3}:
+        if self.values == {'3'}:
             value = '__o'
-        if self.values == {1, 2}:
+        if self.values == {'1', '2'}:
             value = 'oo_'
-        if self.values == {2, 3}:
+        if self.values == {'2', '3'}:
             value = '_oo'
-        if self.values == {1, 3}:
+        if self.values == {'1', '3'}:
             value = 'o_o'
         return '"{1}"={0}'.format(value, self.attr_name)
 
@@ -31,23 +31,7 @@ class Fact:
         return 3 * hash(self.attr_id) + 5 * hash(self.values)
 
     def __eq__(self, other):
-        if not self.attr_id == other.attr_id:
-            return False
-        elif not self.values == other.values:
-            return False
-        return True
-
-    def __gt__(self, other):
-        if self.attr_id == other.attr_id and self.values > other.values:
-            return True
-        else:
-            return False
-
-    def __lt__(self, other):
-        if self.attr_id == other.attr_id and self.values < other.values:
-            return True
-        else:
-            return False
+        return self.attr_id == other.attr_id and self.values == other.values
 
 
 class Rule:
@@ -98,19 +82,26 @@ class ClassDescription:
         for rule in self.rules:
             coverage = rule.covered_positives
             for fact in rule.facts:
-                to_delete = []
-                for old_fact in self.properties:
-                    if fact == old_fact and old_fact.coverage >= coverage:
-                        break
-                    if old_fact > fact:
-                        break
-                    if old_fact < fact:
-                        to_delete.append(old_fact)
-                else:
-                    fact.coverage = coverage
+                fact.coverage = coverage
+                appended = None
+                for prop in self.properties[:]:
+                    if prop.attr_id == fact.attr_id:
+                        if prop.values == fact.values:
+                            prop.coverage = max(prop.coverage, fact.coverage)
+                            appended = prop
+                            break
+                        elif fact.values < prop.values:
+                            prop.coverage = max(prop.coverage, fact.coverage)
+                            appended = prop
+                            break
+                        elif fact.values > prop.values:
+                            self.properties.remove(prop)
+                            if not appended:
+                                self.properties.append(fact)
+                                appended = fact
+                            appended.coverage = max(prop.coverage, fact.coverage)
+                if not appended:
                     self.properties.append(fact)
-                    for to_del in to_delete:
-                        self.properties.remove(to_del)
 
-        self.properties.sort(key=lambda x: x.coverage, reverse=True)
+        self.properties.sort(key=lambda x: (x.coverage, x.attr_name), reverse=True)
         self.properties = self.properties[:max_universe_size]
