@@ -5,6 +5,9 @@ from aq.aq_description import Fact
 import sys, platform, datetime
 import argparse
 import logging
+import cProfile
+from pycallgraph import PyCallGraph
+from pycallgraph.output import GraphvizOutput
 
 log_levels = ['debug', 'info', 'warning', 'error']
 
@@ -60,7 +63,7 @@ if __name__ == "__main__":
             reasons = []
             for hyp in hypotheses:
                 if hyp.value.count() <= max_reason_length:
-                    reasons.append((len(hyp.generator),
+                    reasons.append((hyp.generator.count(),
                                     [data_fb.properties[i] for i in range(len(hyp.value)) if
                                      hyp.value[i]]))
             if reasons:
@@ -71,7 +74,12 @@ if __name__ == "__main__":
                 logging.debug('\tWas not found reasons for {0}'.format(target))
 
 
+        #pr = cProfile.Profile()
+        #pr.enable()
+        # with PyCallGraph(output=GraphvizOutput()):
         _search_in_fb(fb, 'class ' + klass)
+        #pr.disable()
+        #pr.print_stats(sort="calls")
 
         for prop in class_descriptions[klass].properties:
             logging.info('Start search reasons for property {0}'.format(prop))

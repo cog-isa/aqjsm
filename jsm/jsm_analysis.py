@@ -64,15 +64,12 @@ class FactBase:
 
 
 class JSMHypothesis:
-    def __init__(self, value, generator=None):
+    def __init__(self, value, generator):
         self.value = value
-        if generator:
-            self.generator = generator
-        else:
-            self.generator = set()
+        self.generator = generator
 
     def __str__(self):
-        return 'Hypothesis {0} by {1}'.format(self.value.to01(), self.generator)
+        return 'Hypothesis {0} by {1}'.format(self.value.to01(), [i for i, x in enumerate(self.generator) if x])
 
     def __repr__(self):
         return self.value.to01()
@@ -89,34 +86,47 @@ def search_norris(fb):
     neg_inters = _search_norris(fb.negatives)
 
     logging.debug('\tIt was found {0} pos and {1} neg hypothesis'.format(len(pos_inters), len(neg_inters)))
-    counter = 0
+    conf_counter, dup_counter = 0, 0
     for p_inter in pos_inters[:]:
         for n_inter in neg_inters:
             unit = p_inter.value | n_inter.value
             if len(p_inter.generator) < 2 or unit == p_inter.value or unit == n_inter.value:
                 pos_inters.remove(p_inter)
-                counter += 1
+                conf_counter += 1
                 break
 
-    logging.debug('\tIt was deleted conflicted {0} hypothesis'.format(counter))
+    l = pos_inters[:]
+    for i, tmp1 in enumerate(l):
+        for j, tmp2 in enumerate(l):
+            if not i == j and (tmp1.value | tmp2.value) == tmp1.value:
+                pos_inters.remove(tmp1)
+                dup_counter += 1
+                break
+
+    logging.debug('\tIt were deleted {0} conflicted and {1} surplus hypothesis'.format(conf_counter, dup_counter))
+
     return pos_inters
 
 
 def _search_norris(positives):
     # Relation R=AxB, A - objects, B - features, Mk - maximal rectangles (maximal intersections)
     hypotheses = []
+    b = bitarray(max(positives.keys()) + 1)
+    b.setall(0)
     for key, value in positives.items():  # find object xkR
         # compute collection Tk={Ax(B intersect xkR): AxB in Mk-1}
-        tmp_hyps = [JSMHypothesis(value & h.value, h.generator.copy()) for h in hypotheses if (value & h.value).any()]
+        tmp_gen = [JSMHypothesis(value & h.value, h.generator.copy()) for h in hypotheses if (value & h.value).any()]
         # eliminate the members of Tk which are proper subsets of other members of Tk;
         # remaining sets are the members of T'k
 
-        l = tmp_hyps[:]
-        for i, tmp1 in enumerate(l):
-            for j, tmp2 in enumerate(l):
-                if not i == j and (tmp1.value | tmp2.value) == tmp2.value and tmp2.generator >= tmp1.generator:
-                    tmp_hyps.remove(tmp1)
+        tmp_hyps = []
+        for i, tmp1 in enumerate(tmp_gen):
+            for j, tmp2 in enumerate(tmp_gen):
+                if not i == j and (tmp1.value | tmp2.value) == tmp2.value and (
+                            tmp1.generator | tmp2.generator) == tmp2.generator:
                     break
+            else:
+                tmp_hyps.append(tmp1)
 
         # for each CxD in    Mk-1
         new_hyps = []
@@ -124,13 +134,13 @@ def _search_norris(positives):
         for hyp in hypotheses:
             # if D subsetoreq xkR then (C unite xk)xD in Mk
             if (hyp.value | value) == value:
-                hyp.generator.add(key)
+                hyp.generator[key] = 1
             else:
                 # if D not susetoreq xkR then CxD in Mk, and (C unite xk)x(D intersect xkR) in Mk
                 # if and only if emptyset noteq Cx(D intersect xkR) in T'k
                 new_hyp = JSMHypothesis(hyp.value & value, hyp.generator.copy())
                 if new_hyp.value.any() and new_hyp in tmp_hyps:
-                    new_hyp.generator.add(key)
+                    new_hyp.generator[key] = 1
                     new_hyps.append(new_hyp)
             if not value.any() or (hyp.value | value) == hyp.value:
                 add_example = False
@@ -138,7 +148,9 @@ def _search_norris(positives):
         hypotheses.extend(new_hyps)
         # xk x xkR in Mk if and only if emptyset noteq xkR notsubsetoreq D for all XxD in Mk - 1
         if add_example:
-            hypotheses.append(JSMHypothesis(value, {key}))
+            c = b.copy()
+            c[key] = 1
+            hypotheses.append(JSMHypothesis(value, c))
     return hypotheses
 
 
