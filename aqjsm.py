@@ -27,10 +27,15 @@ if __name__ == "__main__":
                            help='Data string of information about nominal columns in format: <col_id1>:<nom1>,<nom2>,...;<col_id2>:<nom1>...')
     args = argparser.parse_args()
 
-    logging.basicConfig(level=getattr(logging, args.loglevel.upper()),
-                        format='%(asctime)s %(message)s',
-                        datefmt='%H:%M:%S',
-                        stream=sys.stdout)
+    rootLogger = logging.getLogger()
+    logFormatter = logging.Formatter('%(asctime)s %(levelname)-8s  %(message)s', datefmt='%H:%M:%S')
+    consoleHandler = logging.StreamHandler()
+    consoleHandler.setFormatter(logFormatter)
+    rootLogger.addHandler(consoleHandler)
+    fileHandler = logging.FileHandler('aqjsm.log', encoding='cp1251')
+    fileHandler.setFormatter(logFormatter)
+    rootLogger.addHandler(fileHandler)
+    rootLogger.setLevel(args.loglevel.upper())
 
     logging.info('OS: {0}, date: {1}'.format(platform.platform(), datetime.datetime.now().strftime("%Y-%m-%d")))
     logging.info(args)
@@ -74,13 +79,13 @@ if __name__ == "__main__":
                 logging.debug('\tWas not found reasons for {0}'.format(target))
 
 
-        #pr = cProfile.Profile()
-        #pr.enable()
+        # pr = cProfile.Profile()
+        # pr.enable()
         # with PyCallGraph(output=GraphvizOutput()):
         _search_in_fb(fb, 'class ' + klass)
-        #pr.disable()
-        #pr.print_stats(sort="calls")
-        #exit()
+        # pr.disable()
+        # pr.print_stats(sort="calls")
+        # exit()
 
         for prop in class_descriptions[klass].properties:
             logging.info('Start search reasons for property {0}'.format(prop))
