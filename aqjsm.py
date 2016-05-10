@@ -74,12 +74,13 @@ if __name__ == "__main__":
                 logging.debug('\tWas not found reasons for {0}'.format(target))
 
 
-        #pr = cProfile.Profile()
-        #pr.enable()
+        pr = cProfile.Profile()
+        pr.enable()
         # with PyCallGraph(output=GraphvizOutput()):
         _search_in_fb(fb, 'class ' + klass)
-        #pr.disable()
-        #pr.print_stats(sort="calls")
+        pr.disable()
+        pr.print_stats(sort="calls")
+        exit()
 
         for prop in class_descriptions[klass].properties:
             logging.info('Start search reasons for property {0}'.format(prop))

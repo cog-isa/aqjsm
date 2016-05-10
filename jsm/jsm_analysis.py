@@ -77,35 +77,42 @@ class JSMHypothesis:
     def __eq__(self, other):
         return self.value == other.value and self.generator == other.generator
 
+    def __ge__(self, other):
+        return ((self.value | other.value) == self.value) and ((self.generator | other.generator) == self.generator)
+
     def __hash__(self):
         return 3 * hash(self.value.to01()) + 5 * hash(str(self.generator))
 
 
 def search_norris(fb):
-    pos_inters = _search_norris(fb.positives)
-    neg_inters = _search_norris(fb.negatives)
+    if fb.positives:
+        pos_inters = _search_norris(fb.positives)
+        neg_inters = _search_norris(fb.negatives)
 
-    logging.debug('\tIt was found {0} pos and {1} neg hypothesis'.format(len(pos_inters), len(neg_inters)))
-    conf_counter, dup_counter = 0, 0
-    for p_inter in pos_inters[:]:
-        for n_inter in neg_inters:
-            unit = p_inter.value | n_inter.value
-            if len(p_inter.generator) < 2 or unit == p_inter.value or unit == n_inter.value:
-                pos_inters.remove(p_inter)
-                conf_counter += 1
-                break
+        logging.debug('\tIt was found {0} pos and {1} neg hypothesis'.format(len(pos_inters), len(neg_inters)))
+        conf_counter, dup_counter = 0, 0
+        for p_inter in pos_inters[:]:
+            for n_inter in neg_inters:
+                unit = p_inter.value | n_inter.value
+                if len(p_inter.generator) < 2 or unit == p_inter.value or unit == n_inter.value:
+                    pos_inters.remove(p_inter)
+                    conf_counter += 1
+                    break
 
-    l = pos_inters[:]
-    for i, tmp1 in enumerate(l):
-        for j, tmp2 in enumerate(l):
-            if not i == j and (tmp1.value | tmp2.value) == tmp1.value:
-                pos_inters.remove(tmp1)
-                dup_counter += 1
-                break
+        l = pos_inters[:]
+        for i, tmp1 in enumerate(l):
+            for j, tmp2 in enumerate(l):
+                if not i == j and (tmp1.value | tmp2.value) == tmp1.value:
+                    pos_inters.remove(tmp1)
+                    dup_counter += 1
+                    break
 
-    logging.debug('\tIt were deleted {0} conflicted and {1} surplus hypothesis'.format(conf_counter, dup_counter))
+        logging.debug('\tIt were deleted {0} conflicted and {1} surplus hypothesis'.format(conf_counter, dup_counter))
 
-    return pos_inters
+        return pos_inters
+    else:
+        logging.debug('\tThere is no positives examples in FB')
+        return None
 
 
 def _search_norris(positives):
@@ -115,31 +122,34 @@ def _search_norris(positives):
     b.setall(0)
     for key, value in positives.items():  # find object xkR
         # compute collection Tk={Ax(B intersect xkR): AxB in Mk-1}
-        tmp_gen = [JSMHypothesis(value & h.value, h.generator.copy()) for h in hypotheses if (value & h.value).any()]
+        tmp_gen = [JSMHypothesis(value & h.value, h.generator.copy()) for h in hypotheses]
         # eliminate the members of Tk which are proper subsets of other members of Tk;
         # remaining sets are the members of T'k
 
         tmp_hyps = []
         for i, tmp1 in enumerate(tmp_gen):
-            for j, tmp2 in enumerate(tmp_gen):
-                if not i == j and (tmp1.value | tmp2.value) == tmp2.value and (
-                            tmp1.generator | tmp2.generator) == tmp2.generator:
-                    break
+            if tmp1.generator.any():
+                for j, tmp2 in enumerate(tmp_gen):
+                    if not i == j and tmp2 >= tmp1:
+                        tmp_hyps.append(None)
+                        break
+                else:
+                    tmp_hyps.append(tmp1)
             else:
-                tmp_hyps.append(tmp1)
+                tmp_hyps.append(None)
 
         # for each CxD in    Mk-1
         new_hyps = []
         add_example = True
-        for hyp in hypotheses:
+        for i, hyp in enumerate(hypotheses):
             # if D subsetoreq xkR then (C unite xk)xD in Mk
             if (hyp.value | value) == value:
                 hyp.generator[key] = 1
             else:
                 # if D not susetoreq xkR then CxD in Mk, and (C unite xk)x(D intersect xkR) in Mk
                 # if and only if emptyset noteq Cx(D intersect xkR) in T'k
-                new_hyp = JSMHypothesis(hyp.value & value, hyp.generator.copy())
-                if new_hyp.value.any() and new_hyp in tmp_hyps:
+                new_hyp = tmp_hyps[i]
+                if new_hyp:
                     new_hyp.generator[key] = 1
                     new_hyps.append(new_hyp)
             if not value.any() or (hyp.value | value) == hyp.value:
