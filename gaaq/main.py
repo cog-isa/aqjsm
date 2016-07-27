@@ -219,7 +219,7 @@ if __name__ == '__main__':
     pr.enable()
 
     NumRealIntervals = 3  # number of intervals into which we will map real values
-    dataset = load_data("class_17_without_missing_16and18.arff")
+    dataset = load_data('class_17_without_missing_16and18.arff')
     processed_data, class_labels, numval_per_gen = preprocess_data(dataset, NumRealIntervals)
     evaluate_AQ_rules(processed_data, class_labels, numval_per_gen)
 
