@@ -128,7 +128,7 @@ def _search_norris(positives):
 
         tmp_hyps = []
         for i, tmp1 in enumerate(tmp_gen):
-            if tmp1.generator.any():
+            if tmp1.value.any():
                 for j, tmp2 in enumerate(tmp_gen):
                     if not i == j and tmp2 >= tmp1:
                         tmp_hyps.append(None)
