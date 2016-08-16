@@ -164,10 +164,49 @@ def _search_norris(positives):
     return hypotheses
 
 
-if __name__ == '__main__':
+def test1():
     fb = FactBase(Fact(0, {'1'}))
     fb.positives = {1: bitarray('11000'), 2: bitarray('11010'), 3: bitarray('11100')}
     fb.negatives = {4: bitarray('00101'), 5: bitarray('00110'), 6: bitarray('00011')}
 
     hypotheses = search_norris(fb)
+    hyp1 = hypotheses
     print('\n'.join(map(str, hypotheses)))
+    return hyp1
+
+
+def test2():  # square
+    fb = FactBase(Fact(0, {'1'}))
+    fb.positives = {1: bitarray('111100100'), 2: bitarray('010101010'), 3: bitarray('011001101')}
+    fb.negatives = {4: bitarray('111010011'), 5: bitarray('100011011'), 6: bitarray('011001011')}
+
+    hypotheses = search_norris(fb)
+    hyp2 = hypotheses
+    print('\n'.join(map(str, hypotheses)))
+    return hyp2
+
+
+
+def test3():  # my test
+    fb = FactBase(Fact(0, {'1'}))
+    fb.positives = {1: bitarray('11100'), 2: bitarray('10011'), 3: bitarray('11011')}
+    fb.negatives = {4: bitarray('10001'), 5: bitarray('01110'), 6: bitarray('01010')}
+
+    hypotheses = search_norris(fb)
+    hyp3 = hypotheses
+    print('\n'.join(map(str, hypotheses)))
+    return hyp3
+
+
+if __name__ == '__main__':
+
+
+
+
+    # print('\nStart test 1 :')
+    # t1 = test1()
+    print('\nStart test 2 :')
+    t2 = test2()
+    print(t2)
+    # print('\nStart test 3 :')
+    # t3 = test3()
