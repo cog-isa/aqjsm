@@ -186,7 +186,6 @@ def test2():  # square
     return hyp2
 
 
-
 def test3():  # my test
     fb = FactBase(Fact(0, {'1'}))
     fb.positives = {1: bitarray('11100'), 2: bitarray('10011'), 3: bitarray('11011')}
@@ -199,10 +198,6 @@ def test3():  # my test
 
 
 if __name__ == '__main__':
-
-
-
-
     # print('\nStart test 1 :')
     # t1 = test1()
     print('\nStart test 2 :')
