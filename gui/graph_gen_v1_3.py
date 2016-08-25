@@ -54,7 +54,7 @@ lengmass=len(t1[0].value) # count of reasons
 
 
 count_line_prop = 2   # point in line prop
-count_line_reas = 3   # point in line reas
+count_line_reas = 4   # point in line reas
 smesh_row=0     # left margin of next row
 scale=3         # space near node
 count_node = 0
