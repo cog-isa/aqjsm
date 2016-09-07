@@ -1,21 +1,22 @@
 import subprocess
-import sys
+import sys, os
 import re
 import logging
+import tempfile
 from aq.aq_description import Fact, Rule, ClassDescription
 
 
 def run_aq(data, class_column, column_names):
     input_text = _generate_input(data, class_column)
 
-    file_name = 'input.aq21'
-    f = open(file_name, 'w')
+    f = tempfile.TemporaryFile(mode='w', delete=False)
     f.write(input_text)
-    f.flush()
+    f.close()
 
     ex_name = './aq/aq21' if sys.platform == 'linux' else 'aq/aq21.exe'
-    output = subprocess.Popen([ex_name, file_name], stdout=subprocess.PIPE).communicate()[0].decode('utf-8')
+    output = subprocess.Popen([ex_name, f.name], stdout=subprocess.PIPE).communicate()[0].decode('utf-8')
 
+    os.remove(f.name)
     logging.debug('AQ output\n' + output)
     descriptions = _parse_result(output, column_names)
 
@@ -105,7 +106,7 @@ def _parse_result(result, column_names):
     rule_regex = re.compile(r'# Rule (\d+)\s+<--([^:]+)')
     part_regex = re.compile(r'\s*\[' + Fact.canon_prefix + r'(\d+)=(\S+)\]')
     # For ATF mode
-    #stat_regex = re.compile(r': p=(\d+),np=(\d+),n=(\d+),q=(\d+\.\d+),cx=(\d+),c=(\d+),s=(\d+) #')
+    # stat_regex = re.compile(r': p=(\d+),np=(\d+),n=(\d+),q=(\d+\.\d+),cx=(\d+),c=(\d+),s=(\d+) #')
     # For TF mode
     stat_regex = re.compile(r': p=(\d+),np=(\d+),u=(\d+),cx=(\d+),c=(\d+),s=(\d+) #')
 
@@ -128,7 +129,7 @@ def _parse_result(result, column_names):
         for i, ((rule_id, rule), (p, np, u, cx, c, s)) in enumerate(zip(rule_matcher, stat_matcher)):
             r = Rule(int(rule_id), [])
             r.covered_positives = int(p)
-            #r.covered_negatives = int(n)
+            # r.covered_negatives = int(n)
             r.complexity = int(cx)
             r.cost = int(c)
             r.significance = int(s)

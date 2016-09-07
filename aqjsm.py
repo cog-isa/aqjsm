@@ -1,19 +1,20 @@
-import data.data_loading as dl
-import aq.aq_external as aq
-from jsm.jsm_analysis import FactBase, search_norris
-from aq.aq_description import Fact
-import sys, platform, datetime
 import argparse
+import datetime
 import logging
-import cProfile
-from pycallgraph import PyCallGraph
-from pycallgraph.output import GraphvizOutput
+import platform
+
+import aq.aq_external as aq
+import data.data_loading as dl
+from aq.aq_description import Fact
+from jsm.jsm_analysis import FactBase, search_norris
 
 log_levels = ['debug', 'info', 'warning', 'error']
 
-if __name__ == "__main__":
+
+def parse_args():
     argparser = argparse.ArgumentParser(description='AQJSM causal relations miner',
-                                        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+                                        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+                                        fromfile_prefix_chars='@')
     argparser.add_argument(dest='datafile')
     argparser.add_argument('-l', '--loglevel', choices=log_levels, default='info',
                            help='Logging level')
@@ -25,8 +26,12 @@ if __name__ == "__main__":
                            help='Index of class column in data file (starting from 0)')
     argparser.add_argument('-n', '--nominaldata',
                            help='Data string of information about nominal columns in format: <col_id1>:<nom1>,<nom2>,...;<col_id2>:<nom1>...')
-    args = argparser.parse_args()
+    args, comment = argparser.parse_known_args()
 
+    return args, comment
+
+
+def configure_logger():
     rootLogger = logging.getLogger()
     logFormatter = logging.Formatter('%(asctime)s %(levelname)-8s  %(message)s', datefmt='%H:%M:%S')
     consoleHandler = logging.StreamHandler()
@@ -38,7 +43,15 @@ if __name__ == "__main__":
     rootLogger.setLevel(args.loglevel.upper())
 
     logging.info('OS: {0}, date: {1}'.format(platform.platform(), datetime.datetime.now().strftime("%Y-%m-%d")))
+
+
+if __name__ == "__main__":
+
+    args, comment = parse_args()
+    configure_logger()
     logging.info(args)
+    logging.info(comment)
+
     max_universe_size = args.univer
     max_reason_length = args.reasonsize
     class_index = args.classid
