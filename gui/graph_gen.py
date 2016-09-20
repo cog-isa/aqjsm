@@ -7,60 +7,121 @@ from networkx.readwrite import json_graph
 import jsm.jsm_analysis as jm  # include our tests
 
 
+def write_html():
+    f = open('test.html', 'w', encoding='utf-8')
+    str1 = '''
 
-def clear_graph():
-    old_i = -1
-    arr = []
-    leng = len(G.node)
-    for i in range(leng):
-        arr.append(i)
-        for j in range(leng):
-            if G.has_edge(i, j):
-                old_i = i
-                # print('i=',i,'\tj=',j)
-        if old_i >= 0 and old_i == i:
-            arr.remove(old_i)
-    # print(arr)
-    G.remove_nodes_from(arr)
+    <html>
+    <head>
+    <meta charset="Utf-8">
+      <style type="text/css">
+      #container {
+        max-width: 800px;
+        height: 800px;
+        margin-left: 15%;
+        background-color:#DFEAFB;
 
+      }
+      #bigtable {
+        background-color: gray;
 
+      }
+      #lefttext {
+        background-color:#FFC3C3;
+
+      }
+
+    </style>
+    </head>
+    <body>
+      <table id="bigtable" border="2">
+      <tr>
+      <td style="min-width:200px; width:15%; background-color:#F7EC8D";>'''
+
+    str2 = '''<div>
+      <p id="result"><b>Для выполнения целей: <br></b>'''
+    for i in range(len(propetis)):
+        str2 += propetis[i] + '; '
+
+    str3 = '''<br><b>Необходимо обладание причин: <br></b>''' + save_reas + '''</p></div>'''
+
+    str4 = '''
+      </td>
+      <td style="min-width:810px; width:60%; background-color:#A7FBA9;">
+          <div id="container"></div>
+      </td>
+
+      <td style="min-width:200px; width:25%";>
+      <div style="background-color:#8B98F9">
+        <b>Цели:</b><br>
+      '''
+
+    # for properties
+
+    str5 = ''''''
+    for i in range(len(propetis)):
+        propetis[i] += br
+        str5 += str(i + 1) + propetis[i]
+
+    str6 = '''
+      </div>
+        <div id="lefttext">
+        <b>Список причин:</b><br>
+        '''
+
+    # THIS  PLACE
+    tempstr = ''''''
+    for i in range(len(reasons_square)):
+        reasons_square[i] += br
+        tempstr += str(i) + reasons_square[i]
+
+    str7 = tempstr
+    str8 = ''' </div>
+      </td>
+        </tr>
+      </table>
+      <script src="sigma.js"></script>
+      <script src="sigma.parsers.json.min.js"></script>
+      <div id = "myid2" name="text" style="height:1px; width: 100%; visibility:hidden;">
+      '''
+    str9 = s
+    str10 = '''
+      </div>'''
+
+    str11 = '''
+      <script>
+       var x = document.getElementById("myid2").innerHTML;
+      // document.getElementById("result").innerHTML = x;
+        // console.log(x)
+    graph = JSON.parse(x)
+    s = new sigma({
+            renderer: {
+              container: 'container',
+              type: 'canvas'
+        },
+            settings: {
+                defaultNodeColor: '#ec5148'
+            }
+    });
+    s.graph.clear();
+    s.graph.read(graph);
+    s.refresh()
+    console.log(s)
+    </script>
+      <p align="center">end &copy;</p>
+    </body>
+    </html>
+    '''
+    f.write(str1 + str2 + str3 + str4 + str5 + str6 + str7 + str8 + str9 + str10 + str11)
 
 # t1 = jm.test1()
 t1 = jm.test2()  # test square
 
 data = pd.read_csv('ex1.csv', encoding='cp1251', sep=';', index_col=False, na_values='?')
-print(data)
-
+names_reas = list(data.columns.values)
 
 reasons_square = []
 propetis = []
-
-r0 =' есть центр симметрии '
-r1 =' есть ось симметрии '
-r2 =' есть ось симметрии, которая является диагональю '
-r3 =' есть ось симметрии, не являющаяся диагональю '
-r4 =' ровно один поворот на 180⁰ переводит фигуру в себя '
-r5 =' порядок группы симметрий равен двум '
-r6 =' есть пара противолежащих прямых углов '
-r7 =' нет прямого угла '
-r8 =' нет оси симметрии или любая ось симметрии является диагональю '
-s0 = ' описать окружность'
-s1 = ' test 1'
-s2 = ' test 2'
-
-
-reasons_square.append(r0)
-reasons_square.append(r1)
-reasons_square.append(r2)
-reasons_square.append(r3)
-reasons_square.append(r4)
-reasons_square.append(r5)
-reasons_square.append(r6)
-reasons_square.append(r7)
-reasons_square.append(r8)
-propetis.append(s0)
-propetis.append(s1)
-propetis.append(s2)
 
 br = '<br>'
 
@@ -72,218 +133,102 @@ leng=len(t1) # count of pairs in hypotheses
 lengmass=len(t1[0].value) # count of reasons
 
 
-count_line_prop = 2   # point in line prop
-count_line_reas = 4   # point in line reas
+count_line_prop = 3   # point in line prop
+count_line_reas = 3   # point in line reas
 smesh_row=0     # left margin of next row
-scale=3         # space near node
+scale=1         # space near node
 
 count_node = 0
-x_t=1*scale
-y_t=2*scale
-
-for i in range(lengmass):
-    lab = 'Reas '+str(i) # reason's name
-
-    if (count_node % count_line_reas==0)&(i>0):
-        y_t+=2*scale
-        x_t=smesh_row+1*scale
-    count_node+=1
-    # print(x_t,y_t)
-    G.add_node(i, x=x_t, y=y_t, size=size_node, label=lab)
-    x_t+=1*scale
-    # labeles.append(lab)
-last_id = i+1
-
-# clear_graph()
-
-mas_edge=[]
-mas_prop=[]
-select_color = 0
-# save_num_reas = []
-save_reas =''''''
-
-
-
 x_t=1*scale
 y_t=1*scale
-count_node = 0
+
+mas_edge=[]
+mas_reas=[]
+mas_prop=[]
+mas_link=[]
+
+
+select_color = 0
+save_reas =''''''
+last_id=0
+name=0
 
 for i in range(leng):
-
-    if (count_node % count_line_prop == 0) & (i > 0):
-        y_t += 2 * scale
-        x_t = smesh_row + 1 * scale
-
     for j in range(lengmass):
         if t1[i].value[j] == True:
-            # print('eest\n')
-            # save_num_reas.append(j)
-            save_reas+=str(j)+'; '
-            lab = 'Св-во ' + str(i)  # Prooertise name
-            Prop_id = last_id + i
-            edge_id = j
-            # print(x_t, y_t, count_node)
-            G.add_node(Prop_id, x=x_t, y=y_t, size=size_node, label=lab, color=colors[select_color])  # add propetis
-
-
-            mas_edge.append(j)
-            mas_prop.append(Prop_id)
-            # labeles.append(lab)
-    select_color += 1
-
-    count_node += 1
-    x_t += 1 * scale
-
+            if mas_reas.count(j) > 0:
+                mas_edge.append(mas_edge[j])
+            else:
+                mas_edge.append(last_id)
+            lab = 'Reas ' + names_reas[j+1]  # Reasons name   from data_frame
+            if mas_reas.count(j)<1:
+                if (count_node % count_line_reas == 0) & (j > 0):
+                    y_t += 2 * scale
+                    x_t = smesh_row + 1 * scale
+                G.add_node(last_id, x=x_t, y=y_t, size=size_node, label=lab, color='darkred')  # add node reas
+                print(last_id, "\t", lab)
+                last_id += 1
+                x_t += 1 * scale
+                count_node += 1
+            mas_reas.append(j)
+        else:
+            mas_edge.append(None)
     save_reas+='<br>'
+    mas_reas.append(None)
 
-# print(save_num_reas)
+num=mas_edge.count(None)
+for i in range(num):
+    mas_edge.remove(None)
 
+count_node=0
+x_t=1*scale
+y_t=1*scale
+
+for i in range(leng):
+    if (count_node % count_line_prop == 0) & (i > 0):
+        y_t += 1 * scale
+        x_t = smesh_row + 1 * scale
+    lab = 'Prop ' + str(i)  # Prooertise name
+    G.add_node(last_id, x=x_t, y=y_t, size=size_node, label=lab, color=colors[select_color])  # add node reas
+    mas_prop.append(last_id)
+    x_t += 1 * scale
+    last_id += 1
+    select_color+=1
+    count_node += 1
+
+print('reas:   ', mas_reas)
+print('edge:   ', mas_edge)
+print('prop:   ', mas_prop)
+
+step_prop=0
+num=mas_edge[0]
 select_color=0
-compare = mas_prop[0]
-s1 = len(mas_edge)
-for i in range(s1):
-    if compare != mas_prop[i]:
-        select_color += 1
-    compare = mas_prop[i]
-    G.add_edge(mas_prop[i], mas_edge[i], id=i+1, color=colors[select_color])
 
+for i in range(len(mas_edge)):
+    if mas_edge[i]<num:
+        step_prop+=1
+        G.add_edge(mas_prop[step_prop], mas_edge[i], id=i, color=colors[select_color])
+        select_color+=1
+        print('m: ',mas_edge[i])
+    else:
+        G.add_edge(mas_prop[step_prop], mas_edge[i], id=i, color=colors[select_color])
+        print('m: ', mas_edge[i])
+
+    num=mas_edge[i]
 
 
 d = json_graph.node_link_data(G)
-d['edges']=d['links']
-d['links']=[]
-
+d['edges'] = d['links']
+d['links'] = []
+# print(d)
 json.dump(d, open('data.json', 'w'))
 import json
 s = json.dumps(d)
 print(s)
 
-
-f = open('test.html', 'w', encoding='utf-8')
-str1='''
-
-<html>
-<head>
-<meta charset="Utf-8">
-  <style type="text/css">
-  #container {
-    max-width: 800px;
-    height: 800px;
-    margin-left: 15%;
-    background-color:#DFEAFB;
-
-  }
-  #bigtable {
-    background-color: gray;
-
-  }
-  #lefttext {
-    background-color:#FFC3C3;
-
-  }
-
-</style>
-</head>
-<body>
-  <table id="bigtable" border="2">
-  <tr>
-  <td style="min-width:200px; width:15%; background-color:#F7EC8D";>'''
-
-str2='''<div>
-  <p id="result"><b>Для выполнения целей: <br></b>'''
-for i in range(len(propetis)):
-    str2+=propetis[i]+'; '
-
-
-str3= '''<br><b>Необходимо обладание причин: <br></b>'''+save_reas+'''</p></div>'''
-
-str4='''
-  </td>
-  <td style="min-width:810px; width:60%; background-color:#A7FBA9;">
-      <div id="container"></div>
-  </td>
-
-  <td style="min-width:200px; width:25%";>
-  <div style="background-color:#8B98F9">
-    <b>Цели:</b><br>
-  '''
-
-# for properties
-
-str5 = ''''''
-for i in range(len(propetis)):
-    propetis[i]+=br
-    str5+=str(i+1)+propetis[i]
-
-str6 = '''
-  </div>
-    <div id="lefttext">
-    <b>Список причин:</b><br>
-    '''
-
-# THIS  PLACE
-tempstr = ''''''
-for i in range(len(reasons_square)):
-    reasons_square[i]+=br
-    tempstr+=str(i)+reasons_square[i]
-
-str7 = tempstr
-str8 = ''' </div>
-  </td>
-    </tr>
-  </table>
-  <script src="sigma.js"></script>
-  <script src="sigma.parsers.json.min.js"></script>
-  <div id = "myid2" name="text" style="height:1px; width: 100%; visibility:hidden;">
-  '''
-str9=s
-str10=  '''
-  </div>'''
-
-str11='''
-  <script>
-   var x = document.getElementById("myid2").innerHTML;
-  // document.getElementById("result").innerHTML = x;
-    // console.log(x)
-graph = JSON.parse(x)
-s = new sigma({
-        renderer: {
-          container: 'container',
-          type: 'canvas'
-    },
-        settings: {
-            defaultNodeColor: '#ec5148'
-        }
-});
-s.graph.clear();
-s.graph.read(graph);
-s.refresh()
-console.log(s)
-</script>
-  <p align="center">end &copy;</p>
-</body>
-</html>
-'''
-f.write(str1+str2+str3+str4+str5+str6+str7+str8+str9+str10+str11)
-
-
-
-
-# clear_graph()
+write_html()
 
 pos = nx.circular_layout(G)
-
-
-
-#
-# leng=len(G.node)
-# for i in range(leng):
-#     if G.has_edge(0, i):
-#         print('aassadasdads')
-#     x_t = pos[i][0]
-#     y_t = pos[i][1]
-#     G.node[i]['x'] = x_t
-#     G.node[i]['y'] = y_t
-
 nx.draw_networkx(G, pos=pos, with_labels=True)
 plt.show()
+
