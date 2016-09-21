@@ -197,6 +197,37 @@ def old_draw():
 
         num = mas_edge[i]
 
+def obsh_draw():
+
+        select_color = 0
+        source = mas_edge[0]
+        target = mas_edge[1]
+        for i in range(len(mas_edge) - 1):
+
+            if source == None or target == None:
+                source = mas_edge[i]
+                target = mas_edge[i + 1]
+                select_color += 1
+            else:
+                G.add_edge(source, target, id=i, color=colors[select_color])
+                target = mas_edge[i + 1]
+
+def posled_draw():
+
+        select_color = 0
+        source = mas_edge[0]
+        target = mas_edge[1]
+        for i in range(len(mas_edge) - 2):
+
+            if source == None or target == None:
+                source = mas_edge[i + 1]
+                target = mas_edge[i + 2]
+                select_color += 1
+            else:
+                G.add_edge(source, target, id=i, color=colors[select_color])
+                source = mas_edge[i + 1]
+                target = mas_edge[i + 2]
+
 
 # t1 = jm.test1()
 t1 = jm.test2()  # test square
@@ -234,9 +265,6 @@ mas_prop = []
 select_color = 0
 last_id = 0
 
-
-
-
 for i in range(leng):
     for j in range(lengmass):
         if t1[i].value[j] == True:
@@ -250,7 +278,6 @@ for i in range(leng):
                     y_t += 2 * scale
                     x_t = smesh_row + 1 * scale
                 G.add_node(last_id, x=x_t, y=y_t, size=size_node, label=lab, color='darkred')  # add node reas
-                # print(last_id, "\t", lab)
                 last_id += 1
                 x_t += 1 * scale
                 count_node += 1
@@ -258,12 +285,6 @@ for i in range(leng):
         else:
             mas_edge.append(None)
     mas_reas.append(None)
-    # print('endpart\n')
-
-# print(mas_edge)
-# print(mas_reas)
-
-
 
 num = mas_edge.count(None)
 for i in range(num):
@@ -276,38 +297,12 @@ for i in range(len(mas_reas)):
 
 print(mas_edge)
 
-
-
-source=mas_edge[0]
-target=mas_edge[1]
-for i in range(len(mas_edge)-2):
-
-    if source == None or target == None:
-        source=mas_edge[i+1]
-        target=mas_edge[i+2]
-        select_color+=1
-    else:
-        G.add_edge(source, target, id=i, color=colors[select_color])
-        print('sour: ', source)
-        print('targ: ', target)
-        print('\n')
-
-        source = mas_edge[i+1]
-        target = mas_edge[i+2]
-        # G.add_edge(mas_prop[step_prop], mas_edge[i], id=i, color=colors[select_color])
-
-
-    # else:
-        # G.add_edge(mas_prop[step_prop], mas_edge[i], id=i, color=colors[select_color])
-        # print('m: ', mas_edge[i])
-
-
-
+# posled_draw()
+obsh_draw()
 
 d = json_graph.node_link_data(G)
 d['edges'] = d['links']
 d['links'] = []
-# print(d)
 json.dump(d, open('data.json', 'w'))
 import json
 s = json.dumps(d)
