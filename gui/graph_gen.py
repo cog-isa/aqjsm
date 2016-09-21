@@ -188,7 +188,7 @@ for i in range(leng):
     if (count_node % count_line_prop == 0) & (i > 0):
         y_t += 1 * scale
         x_t = smesh_row + 1 * scale
-    lab = 'Prop ' + str(i)  # Prooertise name
+    lab = 'Свой-во ' + str(i)  # Prooertise name
     G.add_node(last_id, x=x_t, y=y_t, size=size_node, label=lab, color=colors[select_color])  # add node reas
     mas_prop.append(last_id)
     x_t += 1 * scale
@@ -207,8 +207,8 @@ select_color=0
 for i in range(len(mas_edge)):
     if mas_edge[i]<num:
         step_prop+=1
-        G.add_edge(mas_prop[step_prop], mas_edge[i], id=i, color=colors[select_color])
         select_color+=1
+        G.add_edge(mas_prop[step_prop], mas_edge[i], id=i, color=colors[select_color])
         print('m: ',mas_edge[i])
     else:
         G.add_edge(mas_prop[step_prop], mas_edge[i], id=i, color=colors[select_color])
