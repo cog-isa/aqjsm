@@ -5,9 +5,15 @@ import json
 from networkx.readwrite import json_graph
 
 import jsm.jsm_analysis as jm  # include our tests
+# import test.genHTML as gh
 
+def write_html(s):
 
-def write_html():
+    reasons_square = []
+    propetis = []
+    br = '<br>'
+    save_reas = ''' save_REAS    text'''
+
     f = open('test.html', 'w', encoding='utf-8')
     str1 = '''
 
@@ -39,11 +45,13 @@ def write_html():
       <td style="min-width:200px; width:15%; background-color:#F7EC8D";>'''
 
     str2 = '''<div>
-      <p id="result"><b>Для выполнения целей:  УБРАТЬ !!!! <br></b>'''
-    for i in range(len(propetis)):
-        str2 += propetis[i] + '; '
+      <p id="result"><b>*** Empty place ***<br></b>'''
+    # for i in data['P']:
+    #     if data[i] != 0 and data[i] !=1:
+    #         str2 += ';    EMPTY PLACE'
 
-    str3 = '''<br><b>Необходимо обладание причин: <br></b>''' + save_reas + '''</p></div>'''
+
+    # str3 = '''<br><b>Необходимо обладание причин: <br></b>''' + save_reas + '''</p></div>'''
 
     str4 = '''
       </td>
@@ -53,7 +61,7 @@ def write_html():
 
       <td style="min-width:200px; width:25%";>
       <div style="background-color:#8B98F9">
-        <b>Цели:</b><br>
+        <b>*** Empty place ***</b><br>
       '''
 
     # for properties
@@ -66,7 +74,7 @@ def write_html():
     str6 = '''
       </div>
         <div id="lefttext">
-        <b>Список причин:</b><br>
+        <b>*** Empty place ***</b><br>
         '''
 
     # THIS  PLACE
@@ -112,7 +120,7 @@ def write_html():
     </body>
     </html>
     '''
-    f.write(str1 + str2 + str3 + str4 + str5 + str6 + str7 + str8 + str9 + str10 + str11)
+    f.write(str1 + str2 + str4 + str5 + str6 + str7 + str8 + str9 + str10 + str11)
 
 def old_draw():
     count_line_prop = 3  # point in line prop
@@ -197,7 +205,7 @@ def old_draw():
 
         num = mas_edge[i]
 
-def obsh_draw():
+def obsh_draw(colors):
 
         select_color = 0
         source = mas_edge[0]
@@ -228,87 +236,74 @@ def posled_draw():
                 source = mas_edge[i + 1]
                 target = mas_edge[i + 2]
 
+def draw_nodes(last_id, x_t, y_t, count_node, size_node):
+    leng = len(t1)  # count of pairs in hypotheses
+    lengmass = len(t1[0].value)  # count of reasons
+    for i in range(leng):
+        for j in range(lengmass):
+            if t1[i].value[j] == True:
+                if mas_reas.count(j) > 0:
+                    mas_edge.append(mas_edge[j])
+                else:
+                    mas_edge.append(last_id)
+                lab = names_reas[j + 1]  # Reasons name   from data_frame
+                if mas_reas.count(j) < 1:
+                    if (count_node % count_line_reas == 0) & (j > 0):
+                        y_t += 2 * scale
+                        x_t = smesh_row + 1 * scale
+                    G.add_node(last_id, x=x_t, y=y_t, size=size_node, label=lab, color='darkred')  # add node reas
+                    last_id += 1
+                    x_t += 1 * scale
+                    count_node += 1
+                mas_reas.append(j)
+            else:
+                mas_edge.append(None)
+        mas_reas.append(None)
 
-# t1 = jm.test1()
+    num = mas_edge.count(None)
+    for i in range(num):
+        mas_edge.remove(None)
+
+    for i in range(len(mas_reas)):
+        if mas_reas[i] == None:
+            mas_edge.insert(i, None)
+
 t1 = jm.test2()  # test square
 
 data = pd.read_csv('ex1.csv', encoding='cp1251', sep=';', index_col=False, na_values='?')
 names_reas = list(data.columns.values)
 
-# print(data)
-
-reasons_square = []
-propetis = []
-
-br = '<br>'
-
 G = nx.Graph()
 colors = ['green', 'darkred', 'brown', 'yellow', 'blue', 'orange']
 size_node = 8
 
-leng=len(t1) # count of pairs in hypotheses
-lengmass=len(t1[0].value) # count of reasons
-
+# Parametres
 count_line_prop = 3  # point in line prop
 count_line_reas = 2  # point in line reas
 smesh_row = 0  # left margin of next row
 scale = 1  # space near node
+last_id = 0
 
 count_node = 0
 x_t = 1 * scale
 y_t = 1 * scale
 
-save_reas = ''' save_REAS    text'''
 mas_edge = []
 mas_reas = []
 mas_prop = []
-select_color = 0
-last_id = 0
 
-for i in range(leng):
-    for j in range(lengmass):
-        if t1[i].value[j] == True:
-            if mas_reas.count(j) > 0:
-                mas_edge.append(mas_edge[j])
-            else:
-                mas_edge.append(last_id)
-            lab = names_reas[j + 1]  # Reasons name   from data_frame
-            if mas_reas.count(j) < 1:
-                if (count_node % count_line_reas == 0) & (j > 0):
-                    y_t += 2 * scale
-                    x_t = smesh_row + 1 * scale
-                G.add_node(last_id, x=x_t, y=y_t, size=size_node, label=lab, color='darkred')  # add node reas
-                last_id += 1
-                x_t += 1 * scale
-                count_node += 1
-            mas_reas.append(j)
-        else:
-            mas_edge.append(None)
-    mas_reas.append(None)
-
-num = mas_edge.count(None)
-for i in range(num):
-    mas_edge.remove(None)
-
-
-for i in range(len(mas_reas)):
-    if mas_reas[i]==None:
-        mas_edge.insert(i, None)
-
-print(mas_edge)
-
-# posled_draw()
-obsh_draw()
+draw_nodes(last_id=last_id, x_t=x_t, y_t=y_t, count_node=count_node, size_node=size_node)
+# posled_draw() # next variant of draw grah
+obsh_draw(colors=colors)
 
 d = json_graph.node_link_data(G)
 d['edges'] = d['links']
 d['links'] = []
 json.dump(d, open('data.json', 'w'))
-import json
 s = json.dumps(d)
 print(s)
 
-write_html()
+write_html(s=s)
 
 # pos = nx.circular_layout(G)
 # nx.draw_networkx(G, pos=pos, with_labels=True)
