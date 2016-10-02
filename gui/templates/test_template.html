@@ -1,0 +1,73 @@
+
+
+    <html>
+    <head>
+    <meta charset="Utf-8">
+      <style type="text/css">
+      #container {
+        max-width: 800px;
+        height: 800px;
+        margin-left: 15%;
+        background-color:#DFEAFB;
+
+      }
+      #bigtable {
+        background-color: gray;
+
+      }
+      #lefttext {
+        background-color:#FFC3C3;
+
+      }
+
+    </style>
+    </head>
+    <body>
+      <table id="bigtable" border="2">
+      <tr>
+      <td style="min-width:200px; width:15%; background-color:#F7EC8D";><div>
+      <div id="result"><b>{{ left_side }}<br></b></div>
+      </td>
+      <td style="min-width:810px; width:60%; background-color:#A7FBA9;">
+          <div id="container"></div>
+      </td>
+
+      <td style="min-width:200px; width:25%";>
+      <div style="background-color:#8B98F9">
+        <b> {{ right1 }} </b><br>
+      
+      </div>
+        <div id="lefttext">
+        <b>{{ right2 }}</b><br>
+         </div>
+      </td>
+        </tr>
+      </table>
+      <script src="../sigma.js"></script>
+      <script src="../sigma.parsers.json.min.js"></script>
+      <div id = "myid2" name="text" style="height:1px; width: 100%; visibility:hidden;">
+      {"graph": {}, "links": [], "nodes": [{"color": "darkred", "label": "C2", "id": 0, "x": 1, "y": 3, "size": 8}, {"color": "darkred", "label": "C4", "id": 1, "x": 2, "y": 3, "size": 8}, {"color": "darkred", "label": "C3", "id": 2, "x": 1, "y": 5, "size": 8}, {"color": "darkred", "label": "C7", "id": 3, "x": 2, "y": 5, "size": 8}], "directed": false, "edges": [{"color": "green", "source": 0, "target": 1, "id": 1}, {"color": "brown", "source": 0, "target": 2, "id": 4}, {"color": "brown", "source": 0, "target": 3, "id": 5}], "multigraph": false}
+      </div>
+      <script>
+       var x = document.getElementById("myid2").innerHTML;
+      // document.getElementById("result").innerHTML = x;
+        // console.log(x)
+    graph = JSON.parse(x)
+    s = new sigma({
+            renderer: {
+              container: 'container',
+              type: 'canvas'
+        },
+            settings: {
+                defaultNodeColor: '#ec5148'
+            }
+    });
+    s.graph.clear();
+    s.graph.read(graph);
+    s.refresh()
+    console.log(s)
+    </script>
+      <p align="center">end  {{ variable1 }}  &copy;</p>
+    </body>
+    </html>
+    

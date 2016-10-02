@@ -5,7 +5,8 @@ import json
 from networkx.readwrite import json_graph
 
 import jsm.jsm_analysis as jm  # include our tests
-# import test.genHTML as gh
+
+from flask import Flask
 
 def write_html(s):
 
@@ -49,8 +50,6 @@ def write_html(s):
     # for i in data['P']:
     #     if data[i] != 0 and data[i] !=1:
     #         str2 += ';    EMPTY PLACE'
-
-
     # str3 = '''<br><b>Необходимо обладание причин: <br></b>''' + save_reas + '''</p></div>'''
 
     str4 = '''
@@ -123,6 +122,8 @@ def write_html(s):
     f.write(str1 + str2 + str4 + str5 + str6 + str7 + str8 + str9 + str10 + str11)
 
 def old_draw():
+    leng = len(t1)  # count of pairs in hypotheses
+    lengmass = len(t1[0].value)  # count of reasons
     count_line_prop = 3  # point in line prop
     count_line_reas = 2  # point in line reas
     smesh_row = 0  # left margin of next row
