@@ -302,7 +302,7 @@ d['edges'] = d['links']
 d['links'] = []
 json.dump(d, open('data.json', 'w'))
 s = json.dumps(d)
-print(s)
+# print(s)
 
 write_html(s=s)
 

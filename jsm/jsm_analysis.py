@@ -171,7 +171,7 @@ def test1():
 
     hypotheses = search_norris(fb)
     hyp1 = hypotheses
-    print('\n'.join(map(str, hypotheses)))
+    # print('\n'.join(map(str, hypotheses)))
     return hyp1
 
 
@@ -182,7 +182,7 @@ def test2():  # square
 
     hypotheses = search_norris(fb)
     hyp2 = hypotheses
-    print('\n'.join(map(str, hypotheses)))
+    # print('\n'.join(map(str, hypotheses)))
     return hyp2
 
 
@@ -193,7 +193,7 @@ def test3():  # my test
 
     hypotheses = search_norris(fb)
     hyp3 = hypotheses
-    print('\n'.join(map(str, hypotheses)))
+    # print('\n'.join(map(str, hypotheses)))
     return hyp3
 
 
