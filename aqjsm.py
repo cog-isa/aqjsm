@@ -4,7 +4,7 @@ import logging
 import platform
 
 import aq.aq_external as aq
-import data.data_loading as dl
+import loading.data_loading as dl
 from aq.aq_description import Fact
 from jsm.jsm_analysis import FactBase, search_norris
 
