@@ -1,14 +1,46 @@
 import json
 
 import networkx as nx
-import pandas as pd
 from networkx.readwrite import json_graph
 
-import jsm.jsm_analysis as jm  # include our tests
-from html_generator import generate_cause_html
+_CODE_TMPL = '*GRAPH_TMPL*'
+_BR_TMPL = 'br'
 
 
-def draw_edges_colored(colors):
+def generate_graph(hypothesis, path):
+    # TODO: make job for hypothesis recieved from aqjsm
+    # TODO: fix files square.cfg and ex1.csv
+    G = nx.Graph()
+    colors = ['green', 'darkred', 'brown', 'yellow', 'blue', 'orange']
+    scale = 1  # space near node
+
+    _draw_nodes(G, hypothesis, scale, 8)
+    # _draw_edges(G, colors) # next variant of draw grah
+    _draw_edges_1(G, colors)
+
+    d = json_graph.node_link_data(G)
+    d['edges'] = d['links']
+    d['links'] = []
+    s = json.dumps(d)
+
+    _generate_cause_html(path, s)
+
+
+def _generate_cause_html(path, s):
+    tmpl = open('templates/cause_template.html')
+    text = tmpl.read()
+    tmpl.close()
+
+    text = text.replace(_CODE_TMPL, s)
+
+    dest = open(path, 'w', encoding='utf-8')
+    dest.write(text)
+    dest.close()
+
+
+def _draw_edges_1(G, colors):
+    mas_edge = []
+
     select_color = 0
     source = mas_edge[0]
     target = mas_edge[1]
@@ -22,7 +54,9 @@ def draw_edges_colored(colors):
             target = mas_edge[i + 1]
 
 
-def draw_edges():
+def _draw_edges(G, colors):
+    mas_edge = []
+
     select_color = 0
     source = mas_edge[0]
     target = mas_edge[1]
@@ -38,17 +72,26 @@ def draw_edges():
             target = mas_edge[i + 2]
 
 
-def draw_nodes(last_id, x_t, y_t, count_node, size_node):
-    leng = len(t1)  # count of pairs in hypotheses
-    lengmass = len(t1[0].value)  # count of reasons
+def _draw_nodes(G, hypothesis, scale, size_node):
+    mas_edge = []
+    mas_reas = []
+    last_id = 0
+    count_node = 0
+    x_t, y_t = 1 * scale, 1 * scale
+
+    leng = len(hypothesis)  # count of pairs in hypotheses
+    count_line_reas = 2  # point in line reas
+    smesh_row = 0  # left margin of next row
+
+    lengmass = len(hypothesis[0].value)  # count of reasons
     for i in range(leng):
         for j in range(lengmass):
-            if t1[i].value[j] == True:
+            if hypothesis[i].value[j] == True:
                 if mas_reas.count(j) > 0:
                     mas_edge.append(mas_edge[j])
                 else:
                     mas_edge.append(last_id)
-                lab = names_reas[j + 1]  # Reasons name   from data_frame
+                lab = hypothesis[j + 1]  # Reasons name   from data_frame
                 if mas_reas.count(j) < 1:
                     if (count_node % count_line_reas == 0) & (j > 0):
                         y_t += 2 * scale
@@ -67,42 +110,5 @@ def draw_nodes(last_id, x_t, y_t, count_node, size_node):
         mas_edge.remove(None)
 
     for i in range(len(mas_reas)):
-        if mas_reas[i] == None:
+        if mas_reas[i] is None:
             mas_edge.insert(i, None)
-
-
-if __name__ == '__main__':
-    t1 = jm.test2()  # test square
-
-    data = pd.read_csv('ex1.csv', encoding='cp1251', sep=';', index_col=False, na_values='?')
-    names_reas = list(data.columns.values)
-
-    G = nx.Graph()
-    colors = ['green', 'darkred', 'brown', 'yellow', 'blue', 'orange']
-    size_node = 8
-
-    # Parametres
-    count_line_prop = 3  # point in line prop
-    count_line_reas = 2  # point in line reas
-    smesh_row = 0  # left margin of next row
-    scale = 1  # space near node
-    last_id = 0
-
-    count_node = 0
-    x_t = 1 * scale
-    y_t = 1 * scale
-
-    mas_edge = []
-    mas_reas = []
-    mas_prop = []
-
-    draw_nodes(last_id=last_id, x_t=x_t, y_t=y_t, count_node=count_node, size_node=size_node)
-    # draw_edges() # next variant of draw grah
-    draw_edges_colored(colors=colors)
-
-    d = json_graph.node_link_data(G)
-    d['edges'] = d['links']
-    d['links'] = []
-    s = json.dumps(d)
-
-    generate_cause_html(s)

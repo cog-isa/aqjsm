@@ -7,6 +7,7 @@ import aq.aq_external as aq
 import loading.data_loading as dl
 from aq.aq_description import Fact
 from jsm.jsm_analysis import FactBase, search_norris
+from gui.graph_gen import generate_graph
 
 log_levels = ['debug', 'info', 'warning', 'error']
 
@@ -75,6 +76,8 @@ if __name__ == "__main__":
         fb.build(data, class_descriptions[klass])
         fb.clear()
 
+        all_hypothesis = {}
+
 
         def _search_in_fb(data_fb, target):
             hypotheses = search_norris(data_fb)
@@ -90,6 +93,8 @@ if __name__ == "__main__":
                     ['[{0}]: '.format(q) + ' & '.join([str(f) for f in r]) for q, r in reasons]))
             else:
                 logging.debug('\tWas not found reasons for {0}'.format(target))
+
+            all_hypothesis[target] = hypotheses
 
 
         # pr = cProfile.Profile()
@@ -107,3 +112,5 @@ if __name__ == "__main__":
             fb.clear()
 
             _search_in_fb(fb, prop)
+
+        generate_graph(all_hypothesis, 'cause_net.html')
