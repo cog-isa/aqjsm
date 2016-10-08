@@ -2,21 +2,22 @@ import json
 
 import networkx as nx
 from networkx.readwrite import json_graph
+import pandas as pd
+from jsm.jsm_analysis import test2
+
 
 _CODE_TMPL = '*GRAPH_TMPL*'
 _BR_TMPL = 'br'
 
 
-def generate_graph(hypothesis, path):
+def generate_graph(hypothesis, path, name_reas):
     # TODO: make job for hypothesis recieved from aqjsm
     # TODO: fix files square.cfg and ex1.csv
     G = nx.Graph()
     colors = ['green', 'darkred', 'brown', 'yellow', 'blue', 'orange']
     scale = 1  # space near node
 
-    _draw_nodes(G, hypothesis, scale, 8)
-    # _draw_edges(G, colors) # next variant of draw grah
-    _draw_edges_1(G, colors)
+    _draw_nodes(G, hypothesis, scale, 8, name_reas)
 
     d = json_graph.node_link_data(G)
     d['edges'] = d['links']
@@ -29,6 +30,7 @@ def generate_graph(hypothesis, path):
 def _generate_cause_html(path, s):
     tmpl = open('templates/cause_template.html')
     text = tmpl.read()
+    # print(text)
     tmpl.close()
 
     text = text.replace(_CODE_TMPL, s)
@@ -38,47 +40,14 @@ def _generate_cause_html(path, s):
     dest.close()
 
 
-def _draw_edges_1(G, colors):
-    mas_edge = []
-
-    select_color = 0
-    source = mas_edge[0]
-    target = mas_edge[1]
-    for i in range(len(mas_edge) - 1):
-        if source is None or target is None:
-            source = mas_edge[i]
-            target = mas_edge[i + 1]
-            select_color += 1
-        else:
-            G.add_edge(source, target, id=i, color=colors[select_color])
-            target = mas_edge[i + 1]
-
-
-def _draw_edges(G, colors):
-    mas_edge = []
-
-    select_color = 0
-    source = mas_edge[0]
-    target = mas_edge[1]
-    for i in range(len(mas_edge) - 2):
-
-        if source is None or target is None:
-            source = mas_edge[i + 1]
-            target = mas_edge[i + 2]
-            select_color += 1
-        else:
-            G.add_edge(source, target, id=i, color=colors[select_color])
-            source = mas_edge[i + 1]
-            target = mas_edge[i + 2]
-
-
-def _draw_nodes(G, hypothesis, scale, size_node):
+def _draw_nodes(G, hypothesis, scale, size_node, name_reas):
     mas_edge = []
     mas_reas = []
     last_id = 0
     count_node = 0
     x_t, y_t = 1 * scale, 1 * scale
 
+    colors = ['green', 'darkred', 'brown', 'yellow', 'blue', 'orange']
     leng = len(hypothesis)  # count of pairs in hypotheses
     count_line_reas = 2  # point in line reas
     smesh_row = 0  # left margin of next row
@@ -91,7 +60,7 @@ def _draw_nodes(G, hypothesis, scale, size_node):
                     mas_edge.append(mas_edge[j])
                 else:
                     mas_edge.append(last_id)
-                lab = hypothesis[j + 1]  # Reasons name   from data_frame
+                lab = name_reas[j+1]
                 if mas_reas.count(j) < 1:
                     if (count_node % count_line_reas == 0) & (j > 0):
                         y_t += 2 * scale
@@ -112,3 +81,55 @@ def _draw_nodes(G, hypothesis, scale, size_node):
     for i in range(len(mas_reas)):
         if mas_reas[i] is None:
             mas_edge.insert(i, None)
+
+    _draw_edges_1(G, colors, mas_edge)
+    # _draw_edges(G, colors) # next variant of draw grah
+
+
+def _draw_edges_1(G, colors, mas_edge):
+    # mas_edge = []
+
+    select_color = 0
+    source = mas_edge[0]
+    target = mas_edge[1]
+    for i in range(len(mas_edge) - 1):
+        if source is None or target is None:
+            source = mas_edge[i]
+            target = mas_edge[i + 1]
+            select_color += 1
+        else:
+            G.add_edge(source, target, id=i, color=colors[select_color])
+            target = mas_edge[i + 1]
+
+
+def _draw_edges(G, colors, mas_edge):   # posled draw
+    # mas_edge = []
+
+    select_color = 0
+    source = mas_edge[0]
+    target = mas_edge[1]
+    for i in range(len(mas_edge) - 2):
+
+        if source is None or target is None:
+            source = mas_edge[i + 1]
+            target = mas_edge[i + 2]
+            select_color += 1
+        else:
+            G.add_edge(source, target, id=i, color=colors[select_color])
+            source = mas_edge[i + 1]
+            target = mas_edge[i + 2]
+
+
+if __name__ == '__main__':
+
+
+    data = pd.read_csv('../data/ex1.csv', encoding='cp1251', sep=';', index_col=False, na_values='?')
+    name_reas = list(data.columns.values)
+    print(name_reas)
+    hypothesis = test2()
+    print(hypothesis)
+
+    path = 'templates/res.html'
+
+    generate_graph(hypothesis, path, name_reas)
+
