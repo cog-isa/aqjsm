@@ -85,7 +85,7 @@ class JSMHypothesis:
 
 
 def search_norris(fb):
-    if fb.positives:
+    if fb.positives and fb.negatives:
         pos_inters = _search_norris(fb.positives)
         neg_inters = _search_norris(fb.negatives)
 
@@ -111,8 +111,8 @@ def search_norris(fb):
 
         return pos_inters
     else:
-        logging.debug('\tThere is no positives examples in FB')
-        return None
+        logging.debug('\tThere is no positives or negatives examples in FB')
+        return []
 
 
 def _search_norris(positives):

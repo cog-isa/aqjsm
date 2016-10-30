@@ -3,7 +3,7 @@ class Fact:
 
     def __init__(self, attr_id, values, attr_name=''):
         self.attr_id = attr_id
-        self.values = values
+        self.values = frozenset(values)
         self.attr_name = attr_name
         self.coverage = 0
         self.canon_attr_name = Fact.canon_prefix + str(attr_id)
@@ -24,11 +24,11 @@ class Fact:
             value = 'o_o'
         return '"{1}"={0}'.format(value, self.attr_name)
 
+    def __hash__(self):
+        return 3*self.attr_id + 5*hash(self.values)
+
     def __repr__(self):
         return '{0}={1}'.format(self.canon_attr_name, self.values)
-
-    def __hash__(self):
-        return 3 * hash(self.attr_id) + 5 * hash(self.values)
 
     def __eq__(self, other):
         return self.attr_id == other.attr_id and self.values == other.values
