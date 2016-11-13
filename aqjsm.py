@@ -7,6 +7,7 @@ import aq.aq_external as aq
 import loading.data_loading as dl
 from aq.aq_description import Fact
 from jsm.jsm_analysis import FactBase, search_norris
+import pandas as pd
 from gui.graph_gen import generate_graph
 
 log_levels = ['debug', 'info', 'warning', 'error']
@@ -69,6 +70,8 @@ if __name__ == "__main__":
         desc.build(max_universe_size)
     logging.info('\n'.join([str(class_descriptions[d]) for d in class_descriptions]))
 
+    save_mas = []  # for graph_gen()
+
     for klass in data[class_column].unique():
         logging.info('\n' * 3 + '*' * 5 + 'Start search reasons for class {0}'.format(klass) + '*' * 5)
         logging.info('Start search reasons for class property {0}'.format(klass))
@@ -95,6 +98,10 @@ if __name__ == "__main__":
                 logging.debug('\tWas not found reasons for {0}'.format(target))
 
             all_hypothesis[target] = hypotheses
+            if hypotheses:
+                # all_hypothesis[target] = hypotheses
+                save_mas.append(hypotheses)
+                print(hypotheses)
 
 
         # pr = cProfile.Profile()
@@ -113,4 +120,12 @@ if __name__ == "__main__":
 
             _search_in_fb(fb, prop)
 
-        generate_graph(all_hypothesis, 'cause_net.html')
+
+
+
+    data = pd.read_csv('data/t1.csv', encoding='cp1251', sep=';', index_col=False, na_values='?')
+    name_reas = list(data.columns.values)
+
+
+
+    generate_graph(save_mas, 'gui/templates/cause_net.html', name_reas)

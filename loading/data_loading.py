@@ -7,6 +7,7 @@ column_names = []
 
 def load_data(file_path, class_index, nominal_data):
     data = pd.read_csv(file_path, encoding='cp1251', sep=';', index_col=False, na_values='?', decimal=',')
+    # data = pd.read_csv(file_path, encoding='cp1251', sep=';', index_col=False, na_values='?')
     column_names.extend(list(data.columns))
     data.columns = [Fact.canon_prefix + str(x) for x in range(data.shape[1])]
 
