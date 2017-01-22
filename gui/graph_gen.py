@@ -11,7 +11,7 @@ _BR_TMPL = 'br'
 
 
 def generate_graph(hypothesis, path, name_reas):
-    # TODO: if run 'graph_gen'  change 'tmpl' in code
+    # TODO: if run 'graph_gen'  change 'tmpl'
 
     # name_reas = hypothesis
 
