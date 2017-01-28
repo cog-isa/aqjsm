@@ -27,7 +27,6 @@ def generate_graph(hypothesis, path, name_reas):
     else:
         _draw_nodes1(G, hypothesis, scale, 8, name_reas, count_line_reas, smesh_row)
 
-# PLACE FOR change NODE SIZE
 
     d = json_graph.node_link_data(G)
     d['edges'] = d['links']
@@ -101,6 +100,7 @@ def _draw_nodes2(G, hypothesis, scale, size_node, name_reas, count_line_reas, sm
 
     _draw_edges_1(G, colors, mas_edge)
     # _draw_edges(G, colors) # next variant of draw grah
+
 def _draw_nodes1(G, hypothesis, scale, size_node, name_reas, count_line_reas, smesh_row):
     mas_edge = []
     mas_reas = []
@@ -149,7 +149,6 @@ def _draw_nodes1(G, hypothesis, scale, size_node, name_reas, count_line_reas, sm
 
     _draw_edges_1(G, colors, mas_edge)
     _draw_edges(G, colors, mas_edge) # next variant of draw grah
-
 
 def _draw_edges_1(G, colors, mas_edge):
     # mas_edge = []
