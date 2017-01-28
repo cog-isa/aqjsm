@@ -12,16 +12,22 @@ _BR_TMPL = 'br'
 
 def generate_graph(hypothesis, path, name_reas):
     # TODO: if run 'graph_gen'  change 'tmpl' in code
+    # DEFAULT _draw_edges_1()
 
     # name_reas = hypothesis
 
     G = nx.Graph()
-    colors = ['green', 'darkred', 'brown', 'yellow', 'blue', 'orange']
+    # colors = ['green', 'darkred', 'brown', 'yellow', 'blue', 'orange']
     scale = 2  # space near node
+    count_line_reas = 3  # point in line reas
+    smesh_row = 5  # left margin of next row
+
     if (isinstance(hypothesis[0], list) == True):
-        _draw_nodes2(G, hypothesis, scale, 8, name_reas)
+        _draw_nodes2(G, hypothesis, scale, 8, name_reas, count_line_reas, smesh_row)
     else:
-        _draw_nodes1(G, hypothesis, scale, 8, name_reas)
+        _draw_nodes1(G, hypothesis, scale, 8, name_reas, count_line_reas, smesh_row)
+
+# PLACE FOR change NODE SIZE
 
     d = json_graph.node_link_data(G)
     d['edges'] = d['links']
@@ -46,7 +52,7 @@ def _generate_cause_html(path, s):
     dest.close()
 
 
-def _draw_nodes2(G, hypothesis, scale, size_node, name_reas):
+def _draw_nodes2(G, hypothesis, scale, size_node, name_reas, count_line_reas, smesh_row):
     mas_edge = []
     mas_reas = []
     last_id = 0
@@ -55,9 +61,7 @@ def _draw_nodes2(G, hypothesis, scale, size_node, name_reas):
 
     colors = ['green', 'darkred', 'brown', 'yellow', 'blue', 'orange']
     node_colors = ['darkblue', 'purple', 'gray']
-    sel_nod_col = 0 # select color for NODES
-    count_line_reas = 4  # point in line reas
-    smesh_row = 5  # left margin of next row
+    sel_nod_col = 0  # select color for NODES
 
     d1 = len(hypothesis)  # count of pairs in hypotheses
     for i in range(d1):
@@ -97,8 +101,7 @@ def _draw_nodes2(G, hypothesis, scale, size_node, name_reas):
 
     _draw_edges_1(G, colors, mas_edge)
     # _draw_edges(G, colors) # next variant of draw grah
-
-def _draw_nodes1(G, hypothesis, scale, size_node, name_reas):
+def _draw_nodes1(G, hypothesis, scale, size_node, name_reas, count_line_reas, smesh_row):
     mas_edge = []
     mas_reas = []
     last_id = 0
@@ -108,8 +111,6 @@ def _draw_nodes1(G, hypothesis, scale, size_node, name_reas):
     colors = ['green', 'darkred', 'brown', 'yellow', 'blue', 'orange']
     node_colors = ['darkblue', 'purple', 'gray']
     sel_nod_col = 0  # select color for NODES
-    count_line_reas = 2  # point in line reas
-    smesh_row = 5  # left margin of next row
 
     d1 = len(hypothesis)  # count of pairs in hypotheses
     for i in range(d1):
@@ -147,7 +148,7 @@ def _draw_nodes1(G, hypothesis, scale, size_node, name_reas):
             mas_edge.insert(i, None)
 
     _draw_edges_1(G, colors, mas_edge)
-    # _draw_edges(G, colors) # next variant of draw grah
+    _draw_edges(G, colors, mas_edge) # next variant of draw grah
 
 
 def _draw_edges_1(G, colors, mas_edge):
@@ -167,6 +168,7 @@ def _draw_edges_1(G, colors, mas_edge):
             G.add_edge(source, target, id=i, color=colors[select_color])
             target = mas_edge[i + 1]
 
+    _change_node_size(G, mas_edge)
 
 def _draw_edges(G, colors, mas_edge):   # posled draw
     # mas_edge = []
@@ -184,6 +186,40 @@ def _draw_edges(G, colors, mas_edge):   # posled draw
             G.add_edge(source, target, id=i, color=colors[select_color])
             source = mas_edge[i + 1]
             target = mas_edge[i + 2]
+
+    _change_node_size(G, mas_edge)
+
+def _change_node_size(G, mas_edge):
+
+
+    mas_node_size = []
+
+    for i in range(len(mas_edge)):
+        if (mas_edge.count(i) > 0):
+            mas_node_size.append(mas_edge.count(i))
+            if (mas_node_size[i] >= 10):
+                mas_node_size[i] = 10
+            if ((mas_node_size[i] < 10) and (mas_node_size[i] >= 2)):
+                mas_node_size[i] = 8
+            if (mas_node_size[i] < 2):
+                mas_node_size[i] = 6
+
+    for i in range(len(mas_node_size)):
+        # print(nx.get_node_attributes(G)
+        G.node[i]['size'] = mas_node_size[i]
+        # print(nx.info(G,i))
+
+    _change_node_color(G, mas_node_size)
+
+def _change_node_color(G, mas_node_size):
+    node_color = ['red', 'yellow', 'green']
+    for i in range(len(mas_node_size)):
+        if (mas_node_size[i] == 10):
+            G.node[i]['color'] = node_color[0]
+        if (mas_node_size[i] == 8):
+            G.node[i]['color'] = node_color[1]
+        if (mas_node_size[i] == 6):
+            G.node[i]['color'] = node_color[2]
 
 
 if __name__ == '__main__':
