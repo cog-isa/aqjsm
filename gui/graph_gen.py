@@ -11,16 +11,12 @@ _BR_TMPL = 'br'
 
 
 def generate_graph(hypothesis, path, name_reas):
-    # TODO: if run 'graph_gen'  change 'tmpl' in code
     # DEFAULT _draw_edges_1()
 
-    # name_reas = hypothesis
-
     G = nx.Graph()
-    # colors = ['green', 'darkred', 'brown', 'yellow', 'blue', 'orange']
     scale = 2  # space near node
-    count_line_reas = 3  # point in line reas
-    smesh_row = 5  # left margin of next row
+    count_line_reas = 2  # point in line reas
+    smesh_row = 1  # left margin of next row
 
     if (isinstance(hypothesis[0], list) == True):
         _draw_nodes2(G, hypothesis, scale, 8, name_reas, count_line_reas, smesh_row)
@@ -199,25 +195,23 @@ def _change_node_size(G, mas_edge):
             if (mas_node_size[i] >= 10):
                 mas_node_size[i] = 10
             if ((mas_node_size[i] < 10) and (mas_node_size[i] >= 2)):
-                mas_node_size[i] = 8
+                mas_node_size[i] = 9
             if (mas_node_size[i] < 2):
-                mas_node_size[i] = 6
+                mas_node_size[i] = 8
 
     for i in range(len(mas_node_size)):
-        # print(nx.get_node_attributes(G)
         G.node[i]['size'] = mas_node_size[i]
-        # print(nx.info(G,i))
 
     _change_node_color(G, mas_node_size)
 
 def _change_node_color(G, mas_node_size):
-    node_color = ['red', 'yellow', 'green']
+    node_color = ['darkred', 'yellow', 'green']
     for i in range(len(mas_node_size)):
         if (mas_node_size[i] == 10):
             G.node[i]['color'] = node_color[0]
-        if (mas_node_size[i] == 8):
+        if (mas_node_size[i] == 9):
             G.node[i]['color'] = node_color[1]
-        if (mas_node_size[i] == 6):
+        if (mas_node_size[i] == 8):
             G.node[i]['color'] = node_color[2]
 
 
