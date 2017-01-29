@@ -2,8 +2,9 @@
 AQJSM machine learnign algorithm
 
 ## what's new:
+* add correct names for Graph
 * added functions for better view
-* successful test with 'rgnf_test.csv'
+* successful test with 'rgnf_test.csv' and 'rgnf_test2.csv'
 
 ### notes:
-* pass correct names for nodes 
+* add description on Html page
