@@ -4,7 +4,7 @@ import io
 import pstats
 from collections import Counter, defaultdict
 
-import arff
+import arff #uninstall arff, install liac_arff
 import numpy as np
 import numpy.random as rand
 
