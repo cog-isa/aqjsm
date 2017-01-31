@@ -3,6 +3,7 @@ import cProfile
 import io
 import pstats
 from collections import Counter, defaultdict
+import sys
 
 import arff #uninstall arff, install liac_arff
 import numpy as np
@@ -38,12 +39,13 @@ def preprocess_data(dataset, NumRealIntervals):
                                dataset['attributes'][:-1]])  # sizes of features
 
     processed_data = []
+    epsilon = 1.e-10
     for d in data:
         d0 = d[:-1]
         for rv in real_values:
             if (not np.isnan(d0[rv])):
                 for numi in range(NumRealIntervals):
-                    if (d0[rv] <= real_mins[rv] + (numi + 1) * 1.0 * real_inters[rv]):
+                    if (d0[rv] <= (real_mins[rv] + (numi + 1) * 1.0 * real_inters[rv])+epsilon):
                         d0[rv] = numi
                         break
         processed_data.append(d0)
@@ -225,7 +227,7 @@ if __name__ == '__main__':
 
     # stop profiling
     pr.disable()
-    s = io.StringIO()
+    s = io.StringIO() if(sys.version_info[0] == 3) else io.BytesIO()
     sortby = 'time'  # 'cumulative'
     ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
     ps.print_stats(10)
