@@ -15,7 +15,7 @@ def generate_graph(hypothesis, path, name_reas):
 
     G = nx.Graph()
     scale = 2  # space near node
-    count_line_reas = 2  # point in line reas
+    count_line_reas = 3  # point in line reas
     smesh_row = 1  # left margin of next row
 
     if (isinstance(hypothesis[0], list) == True):

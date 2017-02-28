@@ -1,36 +1,67 @@
 <head>
     <meta charset="Utf-8">
     <style type="text/css">
-      #container {
+
+html {
+        background: url(logos/back3.jpg) no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+}
+
+p {
+  color: black;
+}
+
+div.intable{
+     margin-top: 10px;
+}
+
+
+#container {
         min-width: 600px;
         min-height: 600px;
         margin-left: 5%;
-        background-color:#DFEAFB;
-      }
-      #bigtable {
-        background-color: gray;
-      }
-      #lefttext {
-        background-color:#FFC3C3;
-      }
+        background-color:/*#DFEAFB*/;
+}
+#bigtable {
+        background-color: /*gray*/;
+}
+#lefttext {
+        background-color:/*#FFC3C3*/;
+}
 
 
     </style>
 </head>
 <body>
-<table id="bigtable" border="2" align="center">
+<div style="height: 700px; margin-right: 20%; margin-left: 20%; text-align: justify; font-family: Arial;">
+    <h1 align="center">a little bit about statistic</h1> <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda asperiores, magnam beatae vel a quisquam nam nisi voluptates. Similique culpa earum nam harum blanditiis aperiam consectetur iure. Libero sit laborum vel ducimus eius nulla earum dolorum accusamus dolorem nihil ad sequi vitae corporis, omnis eos beatae, quam rem, aliquam. Voluptatibus nam, ea similique. Impedit doloribus aspernatur unde iusto quisquam cum atque deserunt assumenda, sunt voluptate aut mollitia, sed facilis necessitatibus ab porro quaerat inventore excepturi error. Quos architecto sint ab modi fuga, fugit itaque nisi odit aliquid, facilis alias fugiat, ea suscipit hic molestiae. Fugit repudiandae ab, nobis? Explicabo odio adipisci tempora necessitatibus repudiandae ipsam similique libero quia reiciendis et fugiat molestias officia, minima rerum, aperiam aut amet blanditiis laudantium dignissimos! Hic amet magnam repellat doloribus recusandae autem accusantium ad laboriosam error possimus, vero eum, atque. Commodi aspernatur unde suscipit in, tempora obcaecati recusandae, culpa consequatur necessitatibus saepe, eos distinctio magni facere incidunt nisi! Consequuntur aut incidunt, temporibus rem, eligendi ab hic dolorum quibusdam aperiam. Facere, quas! Architecto ullam error adipisci saepe in nam aperiam temporibus quisquam, dolore ex eaque voluptas magni itaque voluptatum optio rem. Obcaecati veritatis expedita sapiente nulla quo officia repudiandae est, praesentium explicabo recusandae, hic atque. </p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet distinctio, quasi fuga dolores veniam, voluptatibus fugiat quis quos quaerat, optio rerum repudiandae ratione fugit nemo sit atque dignissimos delectus, commodi modi animi debitis quidem itaque ullam quae molestiae. Aliquid et labore similique, rem culpa laboriosam fuga. Assumenda, ea hic aspernatur molestiae neque eligendi consequatur! Repellat sunt nostrum ducimus, maxime, tempore repudiandae molestias autem cum numquam deserunt optio eligendi harum consectetur repellendus laborum beatae illo officiis blanditiis, eos laboriosam natus est ipsam possimus. Esse pariatur accusantium eveniet quis tempora cum tempore, voluptatem magnam cumque at error commodi similique sunt necessitatibus, culpa adipisci dolorem consequuntur aliquid incidunt magni dolorum. Accusamus sequi cum, consequuntur dolore aut ipsum cumque quidem facilis aperiam impedit ducimus vel, minus culpa blanditiis corporis, non odio! Tempore, quos eius nobis, debitis, assumenda iure aut qui magnam recusandae voluptate, magni sit. Aut possimus saepe atque, doloribus rem ullam recusandae, dolore eligendi perferendis ea maxime nostrum, veritatis, ipsa? Reprehenderit ipsum architecto, corrupti consectetur, esse dignissimos nulla. Eaque culpa, odit delectus accusamus, dicta mollitia expedita voluptatibus minima esse at accusantium soluta odio repellendus, nisi ullam nostrum, quam. Rerum accusantium, optio praesentium sapiente facere, ratione, reprehenderit, voluptatum hic reiciendis dolor ullam dolorum quibusdam.</p>
+</div>
+
+<table id="bigtable" border="2" align="center" style="background-color: /*#EAEAE7*/">
     <tr>
-        <td style="min-width:200px; width:15%; background-color:#F7EC8D" ;>
-            <div></div>
-            <p id="result"><b>*** Empty place ***<br></b>
+        <td style="min-width:200px; width:15%;" valign="top">
+            <div class="intable">            
+            <b>
+                <p>Degree importance of nodes</p>
+                    <ul>
+                        <li style="color: darkred"><p style="color: black">Hight</p></li>
+                        <li style="color: yellow"><p style="color: black">Middle</p></li>
+                            <li style="color: green"><p style="color: black">Low</p></li>
+                    </ul>                
+            </b>
+            </div>
         </td>
-        <td style="width:80%; background-color:#A7FBA9;">
+        <td style="width:80%; background-color: #EAEAE7;">
             <div id="container"></div>
         </td>
 
-        <td style="min-width:200px; width:25%" ;>
-            <div style="background-color:#8B98F9">
-                <b>*** Empty place ***</b><br>
+        <td style="min-width:200px; width:25%;" valign="top">
+            <div class="intable">
+                <b><p>Use mouse wheel for scroll graph</p></b><br>
 
             </div>
             <div id="lefttext">
@@ -39,7 +70,7 @@
         </td>
     </tr>
     <tr style="height: 50%">
-        <td colspan="3" align="center" style="background-color: #FFECEC">LOOOG!!</td>
+        <td colspan="3" align="center" style="background-color: /*#FFECEC*/">LOOOG!!</td>
     </tr>
 </table>
 <script src="sigma.js"></script>
@@ -65,6 +96,6 @@
     console.log(s)
 
 </script>
-<p align="center">end &copy;</p>
+<p align="center"><b>Andrew Miroshnichenko 2016-2017&copy;</b></p>
 </body>
 </html>
