@@ -118,7 +118,9 @@ def search_norris(fb):
 def _search_norris(positives):
     # Relation R=AxB, A - objects, B - features, Mk - maximal rectangles (maximal intersections)
     hypotheses = []
+    # print(positives.keys())
     b = bitarray(max(positives.keys()) + 1)
+    # print(b)
     b.setall(0)
     for key, value in positives.items():  # find object xkR
         # compute collection Tk={Ax(B intersect xkR): AxB in Mk-1}
@@ -161,6 +163,7 @@ def _search_norris(positives):
             c = b.copy()
             c[key] = 1
             hypotheses.append(JSMHypothesis(value, c))
+            # print(hypotheses)
     return hypotheses
 
 
