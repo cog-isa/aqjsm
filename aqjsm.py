@@ -113,4 +113,4 @@ if __name__ == "__main__":
 
             _search_in_fb(fb, prop)
 
-        generate_graph(all_hypothesis, 'cause_net.html')
+        #generate_graph(all_hypothesis, 'cause_net.html')
