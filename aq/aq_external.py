@@ -14,6 +14,7 @@ def run_aq(data, class_column, column_names):
     f.close()
 
     ex_name = './aq/aq21' if sys.platform == 'linux' else 'aq/aq21.exe'
+    logging.debug('Execute process: {0} {1}'.format(ex_name, f.name))
     output = subprocess.Popen([ex_name, f.name], stdout=subprocess.PIPE).communicate()[0].decode('utf-8')
 
     os.remove(f.name)
