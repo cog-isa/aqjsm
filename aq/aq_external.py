@@ -10,6 +10,7 @@ def run_aq(data, class_column, column_names):
     input_text = _generate_input(data, class_column)
 
     f = tempfile.TemporaryFile(mode='w')
+    logging.debug('Temp file created {0}'.format(f))
     f.write(input_text)
     f.close()
 
