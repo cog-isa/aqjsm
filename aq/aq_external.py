@@ -9,7 +9,7 @@ from aq.aq_description import Fact, Rule, ClassDescription
 def run_aq(data, class_column, column_names):
     input_text = _generate_input(data, class_column)
 
-    f = tempfile.NamedTemporaryFile(mode='w')
+    f = tempfile.NamedTemporaryFile(mode='w', delete=False)
     logging.debug('Temp file created {0}'.format(f))
     f.write(input_text)
 
