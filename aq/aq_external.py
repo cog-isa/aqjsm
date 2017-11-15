@@ -12,13 +12,12 @@ def run_aq(data, class_column, column_names):
     f = tempfile.NamedTemporaryFile(mode='w')
     logging.debug('Temp file created {0}'.format(f))
     f.write(input_text)
-    f.close()
 
     ex_name = './aq/aq21' if sys.platform == 'linux' else 'aq/aq21.exe'
     logging.debug('Execute process: {0} {1}'.format(ex_name, f.name))
     output = subprocess.Popen([ex_name, f.name], stdout=subprocess.PIPE).communicate()[0].decode('utf-8')
 
-    os.remove(f.name)
+    f.close()
     logging.debug('AQ output\n' + output)
     descriptions = _parse_result(output, column_names)
 
